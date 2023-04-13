@@ -1,7 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { prisma } from "./lib/prisma";
-import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 interface LoginData {
@@ -31,7 +30,6 @@ export async function appRoutes(app: FastifyInstance) {
 
     if (match || user) {
       let token = jwt.sign({ userId: user.id }, "mysecret");
-      console.log(user);
 
       return res.send({
         token: token,
@@ -186,7 +184,7 @@ export async function appRoutes(app: FastifyInstance) {
     }
   });
 
-  app.get("/person/all", async (_req, res) => {
+  app.get("/person/all", async (req, res) => {
     try {
       const people = await prisma.user.findMany();
       return res.send(people);
@@ -194,14 +192,13 @@ export async function appRoutes(app: FastifyInstance) {
       return res.status(500).send({ error: "Error searching people" });
     }
   });
-
-  app.delete("/person/:id/delete", async (req: any, res) => {
+  app.delete("/persons/:id/delete", async (req: any, res) => {
     const { id } = req.params;
 
     try {
       const deletedPerson = await prisma.user.delete({
         where: {
-          id: req.id,
+          id: req.params.id,
         },
       });
 
@@ -211,39 +208,41 @@ export async function appRoutes(app: FastifyInstance) {
     }
   });
 
-  app.put("/person/:id/edit", async (req: any, res) => {
+  app.put("/person/:id/update", async (req: any, res) => {
     const { id } = req.params;
-    const { name, age, email } = req.body;
+    const { cpf, dateBirth, email, firstName, lastName, phone, password } =
+      req.body;
+
+    console.log("req", req.body);
 
     try {
       const updatedPerson = await prisma.user.update({
         where: {
-          id: req.id,
+          id: id,
         },
         data: {
-          cpf: req.cpf,
-          dateBirth: req.dateBirth,
-          email: req.email,
-          firstName: req.firstName,
-          phone: req.phone,
-          lastName: req.lastName,
-          password: req.password,
+          cpf: cpf,
+          dateBirth: dateBirth,
+          email: email,
+          firstName: firstName,
+          phone: phone,
+          lastName: lastName,
+          password: password,
         },
       });
-
-      res.send(updatedPerson);
+      console.log(updatedPerson, "updated");
     } catch (error) {
       res.status(500).send({ error: "Error edit person" });
     }
   });
 
-  app.get("/person/:id/show", async (req, res) => {
-    const id = req.params;
+  app.get("/person/:id/show", async (req: any, res) => {
+    const { id } = req.params;
 
     try {
       const person = await prisma.user.findUnique({
         where: {
-          id: req.id,
+          id: id,
         },
       });
 

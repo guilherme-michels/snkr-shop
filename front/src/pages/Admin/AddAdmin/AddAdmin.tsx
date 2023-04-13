@@ -1,14 +1,12 @@
 import { useToast } from "@chakra-ui/react";
-import { FormEvent, useState } from "react";
-import { api } from "../../../lib/axios";
+import { useState } from "react";
 import { NormalModal } from "../../../components/Modal/NormalModal";
-import { Password, TreeStructure } from "phosphor-react";
 import { addPerson } from "../../../api/person/person.service";
-import { Person } from "../../../interfaces/PersonInterface";
 import { isAxiosError } from "axios";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useNavigate } from "react-router-dom";
 
 const addAdminSchema = z.object({
   firstName: z.string().min(3),
@@ -42,6 +40,7 @@ export function AddAdmin() {
   });
 
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const navigate = useNavigate();
 
   const onFormSubmit = async (data: AddAdminData) => {
     try {
@@ -53,6 +52,7 @@ export function AddAdmin() {
         duration: 4000,
         isClosable: true,
       });
+      reset();
     } catch (error) {
       if (isAxiosError(error)) {
         let errorDescription = "Error while creating user";

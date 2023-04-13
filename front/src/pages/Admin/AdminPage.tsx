@@ -4,6 +4,7 @@ import { AddAdmin } from "./AddAdmin/AddAdmin";
 import { AddProduct } from "./AddProduct/AddProduct";
 import { DashboardPage } from "./Dashboard/DashboardPage";
 import { StockControlPage } from "./StockControl/StockControlPage";
+import { AdminTable } from "./AddAdmin/AdminTable";
 
 export function AdminPage() {
   return (
@@ -18,6 +19,7 @@ export function AdminPage() {
             </Tab>
             <Tab color={"#000"}>Add product</Tab>
             <Tab color={"#000"}>Add admin</Tab>
+            <Tab color={"#000"}>Users list</Tab>
           </TabList>
 
           <TabPanels>
@@ -35,6 +37,9 @@ export function AdminPage() {
             </TabPanel>
             <TabPanel>
               <AddAdmin />
+            </TabPanel>
+            <TabPanel>
+              <AdminTable />
             </TabPanel>
           </TabPanels>
         </Tabs>

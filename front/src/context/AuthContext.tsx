@@ -38,6 +38,7 @@ export const AuthProvider = ({ children }: PropsWithChildren<unknown>) => {
     } else {
       setIsAuthenticated(false);
       setLoading(false);
+      navigate("/authenticate");
     }
   }, []);
 

@@ -5,6 +5,7 @@ import { LandingPage } from "../pages/Landing/LandingPage";
 import { ShoePage } from "../pages/Shoes/ShoePage";
 import { ShoesPage } from "../pages/Shoes/ShoesPage";
 import { useAuth } from "../context/AuthContext";
+import { AdminEdit } from "../pages/Admin/AddAdmin/AdminEdit";
 
 export function AppRoutes() {
   return (
@@ -14,6 +15,7 @@ export function AppRoutes() {
       <Route path="/shoes" element={<ShoesPage />} />
       <Route path="/shoe/1" element={<ShoePage />} />
       <Route path="/authenticate" element={<Authenticate />} />
+      <Route path="/person/:id/update" element={<AdminEdit />} />
     </ReactRoutes>
   );
 }

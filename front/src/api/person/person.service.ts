@@ -8,7 +8,6 @@ interface PersonResponse {
 
 interface PeopleResponse {
   personList: Person[];
-  message: string;
 }
 
 export interface loginPeople {
@@ -26,9 +25,7 @@ export function addPerson(person: Omit<Person, "id">) {
 }
 
 export function editPerson(person: Person) {
-  return api
-    .put(`/persons/${person.id}/update`, person)
-    .then((res) => res.data);
+  return api.put(`/person/${person.id}/update`, person).then((res) => res.data);
 }
 
 export function editPassword(person: Person) {
@@ -38,9 +35,7 @@ export function editPassword(person: Person) {
 }
 
 export function getPerson(personId: string) {
-  return api
-    .get<PersonResponse>(`/persons/${personId}/show`)
-    .then((res) => res.data);
+  return api.get<Person>(`/person/${personId}/show`).then((res) => res.data);
 }
 
 export function getPersonMe() {
@@ -48,13 +43,11 @@ export function getPersonMe() {
 }
 
 export function getPeople() {
-  return api.get<PeopleResponse>(`/persons`).then((res) => res.data);
+  return api.get<Person[]>(`/person/all`).then((res) => res.data);
 }
 
-export function deletePerson(person: Person) {
-  return api
-    .delete<PersonResponse>(`/persons/${person.id}/delete`)
-    .then((res) => res.data);
+export function deletePerson(personId: string) {
+  return api.delete(`/persons/${personId}/delete`).then((res) => res.data);
 }
 
 export function validateLogin(person: loginPeople) {
