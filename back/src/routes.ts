@@ -133,7 +133,7 @@ export async function appRoutes(app: FastifyInstance) {
     }
   });
 
-  app.post("/person/store", async (request) => {
+  app.post("/person/store", async (request, response) => {
     const createPerson = z.object({
       firstName: z.string(),
       lastName: z.string(),
@@ -157,6 +157,14 @@ export async function appRoutes(app: FastifyInstance) {
     } = createPerson.parse(request.body);
 
     try {
+      const accountAlreadyExists = await prisma.user.findFirst({
+        where: { email },
+      });
+
+      if (accountAlreadyExists) {
+        return response.status(409).send({ error: "E-mail already exists" });
+      }
+
       const newPerson = await prisma.user.create({
         data: {
           firstName,
@@ -170,9 +178,11 @@ export async function appRoutes(app: FastifyInstance) {
         },
       });
 
-      return newPerson;
+      return response.send();
     } catch (error) {
-      return error;
+      return response
+        .status(500)
+        .send({ error: "Error while creating account" });
     }
   });
 

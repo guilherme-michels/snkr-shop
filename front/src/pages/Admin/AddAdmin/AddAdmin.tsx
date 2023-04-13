@@ -2,89 +2,79 @@ import { useToast } from "@chakra-ui/react";
 import { FormEvent, useState } from "react";
 import { api } from "../../../lib/axios";
 import { NormalModal } from "../../../components/Modal/NormalModal";
-import { Password } from "phosphor-react";
+import { Password, TreeStructure } from "phosphor-react";
 import { addPerson } from "../../../api/person/person.service";
 import { Person } from "../../../interfaces/PersonInterface";
+import { isAxiosError } from "axios";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
-interface AddAdminData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  position: string;
-  phone: string;
-  cpf: string;
-  dateBirth: string;
-}
+const addAdminSchema = z.object({
+  firstName: z.string().min(3),
+  lastName: z.string().min(3),
+  email: z.string().email().nonempty(),
+  password: z.string().min(5),
+  position: z.string().min(3),
+  phone: z.string().min(11).max(11),
+  cpf: z.string().min(11).max(11),
+  dateBirth: z.string().nonempty(),
+});
+
+type AddAdminData = z.infer<typeof addAdminSchema>;
 
 export function AddAdmin() {
   const toast = useToast();
 
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [position, setPosition] = useState("");
-  const [dateBirth, setDateBirth] = useState("");
-  const [cpf, setCpf] = useState("");
-  const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
+  const { handleSubmit, register, reset } = useForm<AddAdminData>({
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      cpf: "",
+      dateBirth: "",
+      email: "",
+      password: "",
+      phone: "",
+      position: "",
+    },
+    shouldUseNativeValidation: true,
+    resolver: zodResolver(addAdminSchema),
+  });
 
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  const onFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    const data: AddAdminData = {
-      firstName,
-      lastName,
-      email,
-      password,
-      position,
-      phone,
-      cpf,
-      dateBirth,
-    };
-
+  const onFormSubmit = async (data: AddAdminData) => {
     try {
-      const res = await addPerson(data);
+      await addPerson(data);
 
-      if (res.person != null) {
+      toast({
+        description: "New user created",
+        status: "success",
+        duration: 4000,
+        isClosable: true,
+      });
+    } catch (error) {
+      if (isAxiosError(error)) {
+        let errorDescription = "Error while creating user";
+
+        if (error.response?.status === 409) {
+          errorDescription = "E-mail already exists";
+        }
+
         toast({
-          description: "New user created",
-          status: "success",
-          duration: 4000,
-          isClosable: true,
-        });
-      } else {
-        toast({
-          description: "Error",
+          description: errorDescription,
           status: "error",
           duration: 4000,
           isClosable: true,
         });
       }
-    } catch (err: any) {
-      console.log(err);
-
-      const errorResponse = err.response;
     }
   };
-
-  function clearForm() {
-    setFirstName("");
-    setLastName("");
-    setEmail("");
-    setPosition("");
-    setPhone("");
-    setCpf("");
-    setDateBirth("");
-    setPassword("");
-  }
 
   return (
     <div className="h-full flex flex-col items-center ">
       <div className="flex justify-between w-[70%]">
-        <form onSubmit={onFormSubmit} className="w-full">
+        <form onSubmit={handleSubmit(onFormSubmit)} className="w-full">
           <div className="grid grid-cols-2 grid-flow-row gap-14">
             <div className="mt-3">
               <label>First name *</label>
@@ -92,8 +82,7 @@ export function AddAdmin() {
                 type="text"
                 placeholder="First name"
                 className="w-full p-3 mt-1 rounded-lg placeholder:text-zinc-400 border-[1px] border-zinc-500"
-                value={firstName}
-                onChange={(event) => setFirstName(event.target.value)}
+                {...register("firstName")}
               />
             </div>
 
@@ -103,8 +92,7 @@ export function AddAdmin() {
                 type="text"
                 placeholder="Last name"
                 className="w-full p-3 mt-1 rounded-lg placeholder:text-zinc-400 border-[1px] border-zinc-500"
-                value={lastName}
-                onChange={(event) => setLastName(event.target.value)}
+                {...register("lastName")}
               />
             </div>
           </div>
@@ -116,8 +104,7 @@ export function AddAdmin() {
                 type="text"
                 placeholder="Phone"
                 className="w-full p-3 mt-1 rounded-lg placeholder:text-zinc-400 border-[1px] border-zinc-500"
-                value={phone}
-                onChange={(event) => setPhone(event.target.value)}
+                {...register("phone")}
               />
             </div>
 
@@ -127,8 +114,7 @@ export function AddAdmin() {
                 type="text"
                 placeholder="Email"
                 className="w-full p-3 mt-1 rounded-lg placeholder:text-zinc-400 border-[1px] border-zinc-500"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
+                {...register("email")}
               />
             </div>
           </div>
@@ -140,8 +126,7 @@ export function AddAdmin() {
                 type="date"
                 placeholder="Birth date"
                 className="w-full p-3 mt-1 rounded-lg placeholder:text-zinc-400 border-[1px] border-zinc-500"
-                value={dateBirth}
-                onChange={(event) => setDateBirth(event.target.value)}
+                {...register("dateBirth")}
               />
             </div>
 
@@ -151,8 +136,7 @@ export function AddAdmin() {
                 type="text"
                 placeholder="CPF"
                 className="w-full p-3 mt-1 rounded-lg placeholder:text-zinc-400 border-[1px] border-zinc-500"
-                value={cpf}
-                onChange={(event) => setCpf(event.target.value)}
+                {...register("cpf")}
               />
             </div>
           </div>
@@ -164,8 +148,7 @@ export function AddAdmin() {
                 type="text"
                 placeholder="Position"
                 className="w-full p-3 mt-1 rounded-lg placeholder:text-zinc-400 border-[1px] border-zinc-500"
-                value={position}
-                onChange={(event) => setPosition(event.target.value)}
+                {...register("position")}
               />
             </div>
 
@@ -175,8 +158,7 @@ export function AddAdmin() {
                 type="text"
                 placeholder="Password"
                 className="w-full p-3 mt-1 rounded-lg placeholder:text-zinc-400 border-[1px] border-zinc-500"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
+                {...register("password")}
               />
             </div>
           </div>
@@ -185,6 +167,7 @@ export function AddAdmin() {
             <div className="flex">
               <button
                 onClick={() => setIsModalVisible(true)}
+                type="button"
                 className="bg-red mt-4 rounded-lg p-4 flex items-center font-semibold justify-center hover:opacity-90 transition-all text-white"
               >
                 Clear
@@ -208,7 +191,7 @@ export function AddAdmin() {
           }}
           confirmClear={() => {
             setIsModalVisible(false);
-            clearForm();
+            reset();
           }}
         />
       ) : null}
