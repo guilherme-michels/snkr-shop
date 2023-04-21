@@ -1,12 +1,5 @@
 import { useForm } from "react-hook-form";
-import {
-  FormLabel,
-  FormControl,
-  Input,
-  useToast,
-  Button,
-} from "@chakra-ui/react";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { useToast } from "@chakra-ui/react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { z } from "zod";

@@ -10,28 +10,29 @@ import {
   MenuList,
   MenuItem,
   Button,
-  Input,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
-import { Person } from "../../../interfaces/PersonInterface";
 import { DotsThree, MagnifyingGlass, Pencil, Trash } from "phosphor-react";
 import clsx from "clsx";
 import { ModalDelete } from "../../../components/Modal/ModalDelete";
+import { Product } from "../../../interfaces/ProductInterface";
 
-interface AdminTableProps {
-  people: Array<Person>;
-  onEdit: (person: Person) => void;
-  onDelete: (person: Person) => void;
+interface ProductTableProps {
+  products: Array<Product>;
+  onEdit: (product: Product) => void;
+  onDelete: (product: Product) => void;
 }
 
-export const AdminList: React.FunctionComponent<AdminTableProps> = (props) => {
+export const ProductList: React.FunctionComponent<ProductTableProps> = (
+  props
+) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [personSelected, setPersonSelected] = useState<Person | null>(null);
+  const [productSelected, setProductSelected] = useState<Product | null>(null);
   const [filter, setFilter] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-  const personFilter = props.people.filter((person) =>
-    person.firstName.toLowerCase().includes(filter.toLowerCase())
+  const productFilter = props.products.filter((product) =>
+    product.name.toLowerCase().includes(filter.toLowerCase())
   );
 
   return (
@@ -80,8 +81,8 @@ export const AdminList: React.FunctionComponent<AdminTableProps> = (props) => {
       >
         <Thead>
           <Tr>
-            <Th>First Name</Th>
-            <Th>Last name</Th>
+            <Th>Name</Th>
+            <Th>Type</Th>
             <Th>Email</Th>
             <Th>Position</Th>
             <Th>Phone</Th>
@@ -90,16 +91,11 @@ export const AdminList: React.FunctionComponent<AdminTableProps> = (props) => {
           </Tr>
         </Thead>
         <Tbody>
-          {personFilter.length > 0 ? (
-            personFilter.map((person) => (
-              <Tr key={person.id}>
-                <Td>{person.firstName}</Td>
-                <Td>{person.lastName}</Td>
-                <Td>{person.email}</Td>
-
-                <Td>{person.position}</Td>
-                <Td>{person.phone}</Td>
-                <Td>{person.cpf}</Td>
+          {productFilter.length > 0 ? (
+            productFilter.map((product) => (
+              <Tr key={product.id}>
+                <Td>{product.name}</Td>
+                <Td>{product.type}</Td>
 
                 <Td>
                   <div
@@ -122,7 +118,7 @@ export const AdminList: React.FunctionComponent<AdminTableProps> = (props) => {
                         <DotsThree size={28} />
                       </MenuButton>
                       <MenuList style={{ minWidth: "120px" }}>
-                        <MenuItem onClick={() => props.onEdit(person)}>
+                        <MenuItem onClick={() => props.onEdit(product)}>
                           <div style={{ cursor: "pointer" }}>
                             <span
                               style={{
@@ -142,7 +138,7 @@ export const AdminList: React.FunctionComponent<AdminTableProps> = (props) => {
                         </MenuItem>
                         <MenuItem
                           onClick={() => {
-                            setPersonSelected(person);
+                            setProductSelected(product);
                             setIsModalVisible(true);
                           }}
                         >
@@ -171,21 +167,21 @@ export const AdminList: React.FunctionComponent<AdminTableProps> = (props) => {
             ))
           ) : (
             <tr>
-              <td colSpan={8}>No users</td>
+              <td colSpan={8}>No Products</td>
             </tr>
           )}
         </Tbody>
-        {isModalVisible && personSelected ? (
+        {isModalVisible && productSelected ? (
           <ModalDelete
-            text={personSelected.firstName}
+            text={productSelected.name}
             onCloseModal={() => {
               setIsModalVisible(false);
-              setPersonSelected(null);
+              setProductSelected(null);
             }}
             confirmDelete={() => {
-              props.onDelete(personSelected);
+              props.onDelete(productSelected);
               setIsModalVisible(false);
-              setPersonSelected(null);
+              setProductSelected(null);
             }}
           />
         ) : null}

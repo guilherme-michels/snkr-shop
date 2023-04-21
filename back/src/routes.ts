@@ -210,8 +210,16 @@ export async function appRoutes(app: FastifyInstance) {
 
   app.put("/person/:id/update", async (req: any, res) => {
     const { id } = req.params;
-    const { cpf, dateBirth, email, firstName, lastName, phone, password } =
-      req.body;
+    const {
+      cpf,
+      dateBirth,
+      email,
+      firstName,
+      lastName,
+      phone,
+      password,
+      position,
+    } = req.body;
 
     console.log("req", req.body);
 
@@ -228,9 +236,9 @@ export async function appRoutes(app: FastifyInstance) {
           phone: phone,
           lastName: lastName,
           password: password,
+          position: position,
         },
       });
-      console.log(updatedPerson, "updated");
     } catch (error) {
       res.status(500).send({ error: "Error edit person" });
     }

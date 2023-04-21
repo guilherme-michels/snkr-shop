@@ -33,8 +33,6 @@ export function getProducts() {
   return api.get<ProductsResponse>(`/products`).then((res) => res.data);
 }
 
-export function deleteProduct(product: Product) {
-  return api
-    .delete<ProductResponse>(`/products/${product.id}/delete`)
-    .then((res) => res.data);
+export function deleteProduct(productId: String) {
+  return api.delete(`/products/${productId}/delete`).then((res) => res.data);
 }

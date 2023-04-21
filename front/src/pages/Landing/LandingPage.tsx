@@ -5,15 +5,9 @@ import nikeRunning from "../../assets/nike-running.png";
 import streetWear from "../../assets/streetwear.png";
 import courtPurple from "../../assets/court_purple.jpg";
 
-import {
-  FacebookLogo,
-  InstagramLogo,
-  Plus,
-  ShoppingCart,
-  Trophy,
-  TwitterLogo,
-} from "phosphor-react";
+import { ShoppingCart, Trophy } from "phosphor-react";
 import { Link } from "react-router-dom";
+import { Footer } from "../../components/Footer/Footer";
 
 export function LandingPage() {
   return (
@@ -39,9 +33,11 @@ export function LandingPage() {
           <strong className="text-zinc-500 text-4xl">
             Feel the <span className="text-zinc-800">SPEED</span>
           </strong>
-          <button className="text-white bg-zinc-900 p-2 mt-4 w-[120px] rounded-3xl text-base">
-            See release
-          </button>
+          <Link to="/shoes/nike-invencible">
+            <button className="text-white bg-zinc-900 p-2 mt-4 w-[120px] rounded-3xl text-base">
+              See release
+            </button>
+          </Link>
         </div>
 
         <div className="flex items-center w-full justify-center">
@@ -207,51 +203,7 @@ export function LandingPage() {
             </div>
           </div>
         </div>
-        <div className="w-full h-64 bg-black flex justify-center">
-          <div className="w-[65%] justify-between flex p-4">
-            <div className="flex flex-col">
-              <strong className="mb-1 text-white">Found us</strong>
-              <hr />
-              <div className="flex text-white text-sm mt-1">Find SNKR SHOP</div>
-              <div className="flex text-white text-sm">Gift card</div>
-            </div>
-
-            <div className="flex flex-col">
-              <strong className="mb-1 text-white">About us</strong>
-              <hr />
-              <div className="flex text-white text-sm mt-1">Help</div>
-              <div className="flex text-white text-sm">Contact us</div>
-              <div className="flex text-white text-sm">Payments</div>
-              <div className="flex text-white text-sm">
-                Exchange and returns
-              </div>
-            </div>
-
-            <div className="flex flex-col items-center">
-              <strong className="mb-2 text-white">Follow us</strong>
-              <div className="flex">
-                <Link
-                  to="https://www.facebook.com"
-                  className="bg-white p-1 rounded-full cursor-pointer transition-all hover:bg-zinc-300"
-                >
-                  <FacebookLogo size={20} color="#272727" />
-                </Link>
-                <Link
-                  to="https://www.instagram.com"
-                  className="bg-white p-1 rounded-full cursor-pointer transition-all hover:bg-zinc-300 ml-2"
-                >
-                  <InstagramLogo size={20} color="#272727" />
-                </Link>
-                <Link
-                  to="https://www.twitter.com"
-                  className="bg-white p-1 rounded-full cursor-pointer transition-all hover:bg-zinc-300 ml-2"
-                >
-                  <TwitterLogo size={20} color="#272727" />
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Footer />
       </div>
     </HeaderTemplate>
   );
