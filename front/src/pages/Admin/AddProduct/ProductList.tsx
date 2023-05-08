@@ -31,9 +31,12 @@ export const ProductList: React.FunctionComponent<ProductTableProps> = (
   const [filter, setFilter] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-  const productFilter = props.products.filter((product) =>
-    product.name.toLowerCase().includes(filter.toLowerCase())
-  );
+  const productFilter =
+    props.products && Array.isArray(props.products)
+      ? props.products.filter((product) =>
+          product.name.toLowerCase().includes(filter.toLowerCase())
+        )
+      : [];
 
   return (
     <>
@@ -78,16 +81,12 @@ export const ProductList: React.FunctionComponent<ProductTableProps> = (
         variant="striped"
         colorScheme="blackAlpha"
         className="equipmentTable"
+        size={"sm"}
       >
         <Thead>
           <Tr>
             <Th>Name</Th>
             <Th>Type</Th>
-            <Th>Email</Th>
-            <Th>Position</Th>
-            <Th>Phone</Th>
-            <Th>Cpf</Th>
-            <Th></Th>
           </Tr>
         </Thead>
         <Tbody>
@@ -131,7 +130,7 @@ export const ProductList: React.FunctionComponent<ProductTableProps> = (
                                 size={22}
                                 color="#8f8f8f"
                                 className="mr-2"
-                              />{" "}
+                              />
                               Edit
                             </span>
                           </div>

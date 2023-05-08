@@ -1,20 +1,8 @@
 import { api } from "..";
 import { Product } from "../../interfaces/ProductInterface";
 
-interface ProductResponse {
-  product: Product;
-  message: string;
-}
-
-interface ProductsResponse {
-  productsList: Product[];
-  message: string;
-}
-
 export function addProduct(product: Omit<Product, "id">) {
-  return api
-    .post<ProductResponse>("/products/store", product)
-    .then((res) => res.data);
+  return api.post("/products/store", product).then((res) => res.data);
 }
 
 export function editProduct(product: Product) {
@@ -24,13 +12,11 @@ export function editProduct(product: Product) {
 }
 
 export function getProduct(productId: string) {
-  return api
-    .get<ProductResponse>(`/products/${productId}/show`)
-    .then((res) => res.data);
+  return api.get(`/products/${productId}/show`).then((res) => res.data);
 }
 
 export function getProducts() {
-  return api.get<ProductsResponse>(`/products`).then((res) => res.data);
+  return api.get<Product[]>(`/products/all`).then((res) => res.data);
 }
 
 export function deleteProduct(productId: String) {

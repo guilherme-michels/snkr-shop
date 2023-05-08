@@ -1,18 +1,19 @@
 import { useToast } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NormalModal } from "../../../components/Modal/NormalModal";
 import { isAxiosError } from "axios";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useNavigate } from "react-router-dom";
 import { addProduct } from "../../../api/product/product.service";
+import { IndexUploadFile } from "../uploadFile";
 
 const addProductSchema = z.object({
   name: z.string().min(3),
   type: z.string().min(3),
-  quantity: z.number(),
-  sizes: z.number(),
+  price: z.string(),
+  code: z.string().min(3),
+  attachmentEquip: z.any(),
 });
 
 type AddProductData = z.infer<typeof addProductSchema>;
@@ -20,12 +21,13 @@ type AddProductData = z.infer<typeof addProductSchema>;
 export function AddProduct() {
   const toast = useToast();
 
-  const { handleSubmit, register, reset } = useForm<AddProductData>({
+  const { handleSubmit, register, reset, setValue } = useForm<AddProductData>({
     defaultValues: {
       name: "",
       type: "",
-      quantity: 0,
-      sizes: 0,
+      price: "",
+      code: "",
+      attachmentEquip: "",
     },
     shouldUseNativeValidation: true,
     resolver: zodResolver(addProductSchema),
@@ -33,9 +35,19 @@ export function AddProduct() {
 
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  const onFormSubmit = async (data: AddProductData) => {
+  const [image, setImage] = useState<File | null>(null);
+
+  const onFormSubmit = async (data: AddProductData, values: any) => {
     try {
-      await addProduct(data);
+      let filename = " ";
+
+      if (values.attachmentEquip !== undefined) {
+        filename = values.attachmentEquip.name;
+      }
+      addProduct({
+        ...values,
+        attachmentEquip: filename,
+      });
 
       toast({
         description: "New product created",
@@ -61,6 +73,10 @@ export function AddProduct() {
       }
     }
   };
+
+  useEffect(() => {
+    register(`attachmentEquip`);
+  }, [register]);
 
   return (
     <div className="h-full flex flex-col items-center ">
@@ -90,22 +106,32 @@ export function AddProduct() {
 
           <div className="grid grid-cols-2 grid-flow-row gap-14">
             <div className="mt-3">
-              <label>Quantity *</label>
+              <label>Price (US$)*</label>
               <input
                 type="number"
-                placeholder="Quantity"
+                placeholder="Price"
                 className="w-full p-3 mt-1 rounded-lg placeholder:text-zinc-400 border-[1px] border-zinc-500"
-                {...register("quantity")}
+                {...register("price")}
               />
             </div>
 
             <div className="mt-3">
-              <label>Sizes *</label>
+              <label>Code *</label>
               <input
-                type="number"
-                placeholder="Sizes"
+                type="code"
+                placeholder="Code"
                 className="w-full p-3 mt-1 rounded-lg placeholder:text-zinc-400 border-[1px] border-zinc-500"
-                {...register("sizes")}
+                {...register("code")}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-flow-row gap-14">
+            <div className="mt-3">
+              <label>Image *</label>
+
+              <IndexUploadFile
+                onChangeFiles={(file) => setValue(`attachmentEquip`, file)}
               />
             </div>
           </div>

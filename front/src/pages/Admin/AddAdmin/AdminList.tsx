@@ -77,6 +77,7 @@ export const AdminList: React.FunctionComponent<AdminTableProps> = (props) => {
         variant="striped"
         colorScheme="blackAlpha"
         className="equipmentTable"
+        size={"sm"}
       >
         <Thead>
           <Tr>

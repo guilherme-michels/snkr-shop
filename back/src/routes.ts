@@ -40,24 +40,44 @@ export async function appRoutes(app: FastifyInstance) {
     }
   });
 
-  app.post("/products", async (request) => {
+  app.post("/products/store", async (request, response) => {
     const createProduct = z.object({
       name: z.string(),
       type: z.string(),
-      price: z.number(),
+      price: z.string(),
       code: z.string(),
+      attachmentEquip: z.any(),
     });
 
-    const { name, type, code, price } = createProduct.parse(request.body);
+    const { name, type, code, price, attachmentEquip } = createProduct.parse(
+      request.body
+    );
 
-    await prisma.product.create({
-      data: {
-        name,
-        type,
-        code,
-        price,
-      },
-    });
+    try {
+      const productAlreadyExists = await prisma.product.findFirst({
+        where: { name },
+      });
+
+      if (productAlreadyExists) {
+        return response.status(409).send({ error: "Product already exists" });
+      }
+
+      const newProduct = await prisma.product.create({
+        data: {
+          code,
+          name,
+          type,
+          price,
+          // attachmentEquip,
+        },
+      });
+
+      return response.send();
+    } catch (error) {
+      return response
+        .status(500)
+        .send({ error: "Error while creating account" });
+    }
   });
 
   app.get("/products/all", async (_req, res) => {

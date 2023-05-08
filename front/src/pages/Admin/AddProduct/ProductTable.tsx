@@ -2,22 +2,20 @@ import { useToast } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { Person } from "../../../interfaces/PersonInterface";
-import { deletePerson, getPeople } from "../../../api/person/person.service";
-import { ProductList } from "./PrdoductList";
+import { ProductList } from "./ProductList";
 import { Product } from "../../../interfaces/ProductInterface";
 import {
   deleteProduct,
   getProducts,
 } from "../../../api/product/product.service";
 
-export function AdminTable() {
+export function ProductTable() {
   const [products, setProducts] = useState<Product[]>([]);
   const navigate = useNavigate();
   const toast = useToast();
 
   const fecthProducts = () => {
-    getProducts().then((data) => setProducts(data.productsList));
+    getProducts().then((data) => setProducts(data));
   };
 
   useEffect(() => {

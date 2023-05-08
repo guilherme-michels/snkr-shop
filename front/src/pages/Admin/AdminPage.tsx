@@ -10,7 +10,7 @@ export function AdminPage() {
   return (
     <HeaderTemplate>
       <div>
-        <Tabs>
+        <Tabs isFitted variant="enclosed">
           <TabList>
             <Tab color={"#000"}>NPS</Tab>
             <Tab color={"#000"}>Stock</Tab>
