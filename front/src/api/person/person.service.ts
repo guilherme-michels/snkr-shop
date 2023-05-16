@@ -53,3 +53,15 @@ export function deletePerson(personId: string) {
 export function validateLogin(person: loginPeople) {
   return api.post<loginPeople>("/login", person).then((res) => res.data);
 }
+
+export function getPersonCart() {
+  return api.get(`/person/cart`).then((res) => res.data);
+}
+
+export function deleteProductPersonCart(productId: string) {
+  return api.delete(`/person/cart/${productId}/delete`).then((res) => res.data);
+}
+
+export function addProductPersonCart(productId: string) {
+  return api.post(`/person/cart/${productId}/store`).then((res) => res.data);
+}

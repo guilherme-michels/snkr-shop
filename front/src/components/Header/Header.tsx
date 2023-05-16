@@ -28,7 +28,7 @@ export function Header() {
   const { auth, logout } = useAuth();
 
   return (
-    <div className="fixed flex w-full bg-black shadow-md shadow-zinc-900 h-20 justify-between items-center">
+    <div className="fixed flex w-full bg-black shadow-md shadow-zinc-900 h-20 justify-between items-center z-10">
       <div className="flex">
         <Link to="/shoes">
           <strong className="ml-28 transition-all cursor-pointer text-white text-lg hover:opacity-70">
@@ -93,7 +93,7 @@ export function Header() {
                 fontWeight={"normal"}
                 className="flex items-center justify-between bg-zinc-100 text-zinc-900"
               >
-                Your cart is empty!
+                My cart
                 <X
                   size={22}
                   onClick={onClose}

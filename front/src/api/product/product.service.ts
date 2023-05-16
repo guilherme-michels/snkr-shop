@@ -16,7 +16,7 @@ export function getProduct(productId: string) {
 }
 
 export function getProducts() {
-  return api.get<Product[]>(`/products/all`).then((res) => res.data);
+  return api.get(`/products`).then((res) => res.data);
 }
 
 export function deleteProduct(productId: String) {

@@ -6,7 +6,6 @@ import {
   PropsWithChildren,
 } from "react";
 import { useNavigate } from "react-router-dom";
-import { getPerson } from "../api/person/person.service";
 
 interface Auth {
   isAuthenticated: boolean;

@@ -9,7 +9,44 @@ import { ShoppingCart, Trophy } from "phosphor-react";
 import { Link } from "react-router-dom";
 import { Footer } from "../../components/Footer/Footer";
 
+import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from "react";
+
 export function LandingPage() {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const images = [
+    "https://imgnike-a.akamaihd.net/1920x1920/026282MT.jpg",
+    "https://imgnike-a.akamaihd.net/1920x1920/02627851.jpg",
+    "https://imgnike-a.akamaihd.net/1920x1920/0262797T.jpg",
+    "https://imgnike-a.akamaihd.net/768x768/026275MT.jpg",
+    "https://imgnike-a.akamaihd.net/768x768/02625615.jpg",
+    "https://imgnike-a.akamaihd.net/768x768/02625551.jpg",
+    "https://imgnike-a.akamaihd.net/768x768/02622515.jpg",
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveIndex((prevIndex) =>
+        prevIndex === images.length - 1 ? 0 : prevIndex + 1
+      );
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const handlePrev = () => {
+    setActiveIndex((prevIndex) =>
+      prevIndex === 0 ? images.length - 1 : prevIndex - 1
+    );
+  };
+
+  const handleNext = () => {
+    setActiveIndex((prevIndex) =>
+      prevIndex === images.length - 1 ? 0 : prevIndex + 1
+    );
+  };
+
   return (
     <HeaderTemplate>
       <div className="h-full">
@@ -43,7 +80,7 @@ export function LandingPage() {
         <div className="flex items-center w-full justify-center">
           <div className="grid grid-cols-3 grid-flow-row gap-2 mt-16 w-[65%]">
             <div
-              className="w-full h-[500px] rounded flex items-end p-4 cursor-pointer"
+              className="w-full h-[500px] rounded flex items-end p-4 cursor-pointer hover:scale-[102%] transition-all"
               style={{
                 backgroundImage: `url(${jordan})`,
                 backgroundSize: "cover",
@@ -54,7 +91,7 @@ export function LandingPage() {
               </strong>
             </div>
             <div
-              className="w-full h-[500px] rounded flex items-end p-4 cursor-pointer"
+              className="w-full h-[500px] rounded flex items-end p-4 cursor-pointer hover:scale-[102%] transition-all"
               style={{
                 backgroundImage: `url(${streetWear})`,
                 backgroundSize: "cover",
@@ -65,13 +102,13 @@ export function LandingPage() {
               </strong>
             </div>
             <div
-              className="w-full h-[500px] rounded flex items-end p-4 cursor-pointer"
+              className="w-full h-[500px] rounded flex items-end p-4 cursor-pointer hover:scale-[102%] transition-all"
               style={{
                 backgroundImage: `url(${nikeRunning})`,
                 backgroundSize: "cover",
               }}
             >
-              <strong className="bg-white p-2 rounded-2xl text-sm text-zinc-900">
+              <strong className="bg-white p-2 rounded-2xl text-sm text-zinc-900  ">
                 Running
               </strong>
             </div>
@@ -93,7 +130,52 @@ export function LandingPage() {
           </div>
         </div>
 
-        <div className="flex items-center w-full justify-center flex-col">
+        <div className="flex items-center w-full justify-center bg-gradient-to-r from-[#e2e2e2] via-[#fff] to-[#e2e2e2]">
+          <div
+            style={{
+              width: "35%",
+              height: "400px",
+              position: "relative",
+            }}
+          >
+            <motion.img
+              src={images[activeIndex]}
+              alt="Carousel Image"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+              }}
+            />
+
+            <div
+              style={{
+                position: "absolute",
+                bottom: "10px",
+                left: "50%",
+                transform: "translateX(-50%)",
+                display: "flex",
+                gap: "10px",
+              }}
+            >
+              {images.map((image, index) => (
+                <div
+                  key={index}
+                  style={{
+                    width: "10px",
+                    height: "10px",
+                    borderRadius: "50%",
+                    background: activeIndex === index ? "white" : "gray",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => setActiveIndex(index)}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center w-full justify-center flex-col mt-20">
           <strong className="text-zinc-500 text-base flex items-center">
             BEST SELLERS
             <Trophy className="#828282 ml-2" size={22} />

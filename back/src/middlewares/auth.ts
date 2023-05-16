@@ -1,21 +1,31 @@
-import { Request, Response, NextFunction } from "express";
+import { FastifyRequest, FastifyReply } from "fastify";
 import jwt from "jsonwebtoken";
+import { PrismaClient } from "@prisma/client";
 
-export const validateJwt = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const token = req.headers["authorization"];
-  const secret = "mysecret";
+const prisma = new PrismaClient();
 
-  if (token == null) {
-    return res.status(403).end();
+export const validateJwt = async (req: FastifyRequest, reply: FastifyReply) => {
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (!token) {
+    return reply.status(401).send({ error: "Token not provided" });
   }
 
-  // Efetuando a validação do JWT:
-  const decoded = jwt.verify(token, secret);
-  console.log(`decoded`, decoded);
+  try {
+    const decoded = jwt.verify(token, "mysecret") as { userId: string };
 
-  return res.status(200).end();
+    const user = await prisma.user.findFirst({
+      where: {
+        id: decoded.userId,
+      },
+    });
+
+    if (!user) {
+      return reply.status(401).send({ error: "User not found" });
+    }
+
+    req.user = user;
+  } catch (error) {
+    return reply.status(401).send({ error: "Token not valid" });
+  }
 };

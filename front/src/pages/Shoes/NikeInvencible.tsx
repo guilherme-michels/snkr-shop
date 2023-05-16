@@ -1,16 +1,11 @@
 import { HeaderTemplate } from "../../templates/HeaderTemplate";
-
-import runGif from "../../assets/run.gif";
-import nikeInvencible1 from "../../assets/nike-invencible1.jpg";
 import nikeInvencible2 from "../../assets/nike-invincible2.jpg";
 import nikeInvencible3 from "../../assets/nike-invencible3.jpg";
-import nikeInvencible4 from "../../assets/nike-invencible4.png";
-import { Footer } from "../../components/Footer/Footer";
 
 export function NikeInvenciblePage() {
   return (
     <HeaderTemplate>
-      <div className="h-full text-black w-full flex justify-center p-10">
+      <div className="h-full text-black w-full flex justify-center p-4">
         <div className="flex flex-col">
           <div className="grid grid-cols-2 grid-flow-row ">
             <img src={nikeInvencible2} alt="" />
@@ -18,17 +13,25 @@ export function NikeInvenciblePage() {
           </div>
 
           <div className="flex h-full d w-full">
-            <div className="text-6xl font-extrabold w-1/2">
-              NIKE INVENCIBLE 3
+            <div className=" w-1/2 flex flex-col items-center justify-center">
+              <strong className="text-6xl font-extrabold flex items-center justify-center mb-2">
+                NIKE INVENCIBLE 3
+              </strong>
+              <span className="text-lg font font-medium text-zinc-600 flex text-justify">
+                The Invincible Run 3 sports a thick cushioning plate to help you
+                stay on your feet today, tomorrow and beyond. It's super
+                stretchy and flexible, so you can go your way and come back to
+                your next run feeling ready and refreshed.
+              </span>
             </div>
-            <div className="text-8xl font-extrabold w-1/2">
-              <img src={nikeInvencible1} alt="" />
+            <div className="text-2xl font-extrabold w-1/2 flex items-center justify-center">
+              <span className="bg-green p-8 rounded-2xl text-zinc-100 w-1/2 flex items-center justify-center cursor-pointer hover:opacity-80 transition-all">
+                Buy now
+              </span>
             </div>
           </div>
         </div>
       </div>
-
-      <Footer />
     </HeaderTemplate>
   );
 }
