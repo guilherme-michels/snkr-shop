@@ -5,6 +5,7 @@ import { appRoutes } from "./routes";
 const app = Fastify();
 
 app.register(require("@fastify/formbody"));
+app.register(require("@fastify/multipart"));
 
 app.register(appRoutes);
 app.register(cors);

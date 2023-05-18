@@ -15,18 +15,18 @@ datasource db {
 }
 
 model Product {
-  id              String     @id @unique @default(uuid())
-  name            String
-  code            String
-  price           String
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
-  type            String
-  sizes           ShoeSize[]
-  cartItems       CartItem[]
-  Cart            Cart?      @relation(fields: [cartId], references: [id])
-  cartId          String?
-  attachmentEquip String
+  id        String     @id @unique @default(uuid())
+  name      String
+  code      String
+  price     String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  type      String
+  sizes     ShoeSize[]
+  cartItems CartItem[]
+  Cart      Cart?      @relation(fields: [cartId], references: [id])
+  cartId    String?
+  image     String
 }
 
 model User {

@@ -8,7 +8,7 @@ CREATE TABLE "Product" (
     "updatedAt" DATETIME NOT NULL,
     "type" TEXT NOT NULL,
     "cartId" TEXT,
-    "attachmentEquip" TEXT NOT NULL,
+    "image" TEXT NOT NULL,
     CONSTRAINT "Product_cartId_fkey" FOREIGN KEY ("cartId") REFERENCES "Cart" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
 

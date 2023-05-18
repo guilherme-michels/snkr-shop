@@ -1,8 +1,21 @@
 import { api } from "..";
-import { Product } from "../../interfaces/ProductInterface";
+import { AddProductPayload, Product } from "../../interfaces/ProductInterface";
 
-export function addProduct(product: Omit<Product, "id">) {
-  return api.post("/products/store", product).then((res) => res.data);
+export async function addProduct(payload: AddProductPayload, imageFile: File) {
+  const formData = new FormData();
+  formData.append("name", payload.name);
+  formData.append("type", payload.type);
+  formData.append("code", payload.code);
+  formData.append("price", String(payload.price));
+  formData.append("imageFile", imageFile);
+  console.log("formdata", Array.from(formData.entries()));
+  return api
+    .post("/products/store", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+    .then((res) => res.data);
 }
 
 export function editProduct(product: Product) {

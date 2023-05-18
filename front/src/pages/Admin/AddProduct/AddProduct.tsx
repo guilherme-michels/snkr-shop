@@ -6,48 +6,48 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { addProduct } from "../../../api/product/product.service";
-import { IndexUploadFile } from "../uploadFile";
 
 const addProductSchema = z.object({
   name: z.string().min(3),
   type: z.string().min(3),
-  price: z.string(),
+  price: z.number(),
   code: z.string().min(3),
-  attachmentEquip: z.any(),
 });
 
 type AddProductData = z.infer<typeof addProductSchema>;
 
 export function AddProduct() {
   const toast = useToast();
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const { handleSubmit, register, reset, setValue } = useForm<AddProductData>({
     defaultValues: {
       name: "",
       type: "",
-      price: "",
+      price: 0,
       code: "",
-      attachmentEquip: "",
     },
     shouldUseNativeValidation: true,
     resolver: zodResolver(addProductSchema),
   });
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      setSelectedFile(event.target.files[0]);
+    }
+  };
+
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const [image, setImage] = useState<File | null>(null);
 
-  const onFormSubmit = async (data: AddProductData, values: any) => {
+  const onFormSubmit = async (data: AddProductData) => {
     try {
-      let filename = " ";
-
-      if (values.attachmentEquip !== undefined) {
-        filename = values.attachmentEquip.name;
+      if (selectedFile == null) {
+        return;
       }
-      addProduct({
-        ...values,
-        attachmentEquip: filename,
-      });
+
+      await addProduct(data, selectedFile);
 
       toast({
         description: "New product created",
@@ -74,14 +74,14 @@ export function AddProduct() {
     }
   };
 
-  useEffect(() => {
-    register(`attachmentEquip`);
-  }, [register]);
-
   return (
     <div className="h-full flex flex-col items-center ">
       <div className="flex justify-between w-[70%]">
-        <form onSubmit={handleSubmit(onFormSubmit)} className="w-full">
+        <form
+          onSubmit={handleSubmit(onFormSubmit)}
+          className="w-full"
+          encType="multipart/form-data"
+        >
           <div className="grid grid-cols-2 grid-flow-row gap-14">
             <div className="mt-3">
               <label>Name *</label>
@@ -111,7 +111,7 @@ export function AddProduct() {
                 type="number"
                 placeholder="Price"
                 className="w-full p-3 mt-1 rounded-lg placeholder:text-zinc-400 border-[1px] border-zinc-500"
-                {...register("price")}
+                {...register("price", { valueAsNumber: true })}
               />
             </div>
 
@@ -127,12 +127,10 @@ export function AddProduct() {
           </div>
 
           <div className="grid grid-flow-row gap-14">
-            <div className="mt-3">
+            <div className="mt-3 flex flex-col">
               <label>Image *</label>
 
-              <IndexUploadFile
-                onChangeFiles={(file) => setValue(`attachmentEquip`, file)}
-              />
+              <input type="file" onChange={handleFileChange} />
             </div>
           </div>
 

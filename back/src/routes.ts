@@ -3,8 +3,10 @@ import { z } from "zod";
 import { prisma } from "./lib/prisma";
 import jwt from "jsonwebtoken";
 import fs from "fs";
-import { join } from "path";
 import { validateJwt } from "./middlewares/auth";
+import multer from "fastify-multer";
+import path from "path";
+import mime from "mime-types";
 
 interface LoginData {
   email: string;
@@ -47,15 +49,27 @@ export async function appRoutes(app: FastifyInstance) {
     "/products/store",
     { preHandler: [validateJwt] },
     async (request, response) => {
+      const data = await (request as any).file();
+      console.log("grandssse hora", data.fields);
+
+      const body = {
+        name: data.fields.name.value,
+        type: data.fields.name.value,
+        price: Number(data.fields.name.value),
+        code: data.fields.name.value,
+      };
+
+      console.log(`bodyddydd`, body);
+
       const createProduct = z.object({
         name: z.string(),
         type: z.string(),
         price: z.string(),
         code: z.string(),
-        attachmentEquip: z.any(),
+        imageFile: z.any(),
       });
 
-      const { name, type, code, price, attachmentEquip } = createProduct.parse(
+      const { name, type, code, price, imageFile } = createProduct.parse(
         request.body
       );
 
@@ -76,28 +90,13 @@ export async function appRoutes(app: FastifyInstance) {
           return response.status(409).send({ error: "Code already exists" });
         }
 
-        if (attachmentEquip != " ") {
-          const fileName = attachmentEquip.toLowerCase();
-          if (
-            fileName.endsWith(".pdf") ||
-            fileName.endsWith(".jpg") ||
-            fileName.endsWith(".png") ||
-            fileName.endsWith(".jpeg")
-          ) {
-          } else {
-            return response.status(404).send({
-              message: "Unsupported document format.",
-            });
-          }
-        }
-
         const newProduct = await prisma.product.create({
           data: {
             code,
             name,
             type,
             price,
-            attachmentEquip,
+            image: "123.jpg",
           },
         });
 
@@ -401,32 +400,29 @@ export async function appRoutes(app: FastifyInstance) {
     }
   );
 
-  app.get("/file/:id/show", async (req: any, res) => {
-    const id = req.params;
+  // app.get("/file/:id/show", async (req: any, res) => {
+  //   const id = req.params;
 
-    try {
-      const product = await prisma.product.findUnique({
-        where: {
-          id: id,
-        },
-      });
+  //   try {
+  //     const product = await prisma.product.findUnique({
+  //       where: {
+  //         id: id,
+  //       },
+  //     });
 
-      if (!product) {
-        return res
-          .status(404)
-          .send({ message: `Product with id ${id} was not found` });
-      }
+  //     if (!product) {
+  //       return res
+  //         .status(404)
+  //         .send({ message: `Product with id ${id} was not found` });
+  //     }
 
-      const data = fs.readFileSync(
-        join(
-          `C:\Users\guizi\OneDrive\Área de Trabalho\projects\snkr-shop\images`,
-          product?.attachmentEquip
-        )
-      );
+  //     const data = fs.readFileSync(
+  //       join(__dirname, "..", "images", product?.attachmentEquip)
+  //     );
 
-      return res.send(data);
-    } catch (error) {
-      return res.status(500).send({ error: "Error searching equipment" });
-    }
-  });
+  //     return res.send(data);
+  //   } catch (error) {
+  //     return res.status(500).send({ error: "Error searching equipment" });
+  //   }
+  // });
 }
