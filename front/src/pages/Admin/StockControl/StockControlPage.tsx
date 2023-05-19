@@ -6,14 +6,24 @@ import { getProducts } from "../../../api/product/product.service";
 
 export function StockControlPage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [totalValue, setTotalValue] = useState<number>(0);
 
-  const fecthProducts = () => {
-    getProducts().then((data) => setProducts(data));
+  const fecthProducts = async () => {
+    await getProducts().then((data) => setProducts(data));
   };
 
   useEffect(() => {
     fecthProducts();
+    calculateTotalValue();
   }, []);
+
+  const calculateTotalValue = () => {
+    const total = products.reduce(
+      (accumulator, product) => accumulator + Number(product.price),
+      0
+    );
+    setTotalValue(total);
+  };
 
   return (
     <div className="h-full flex flex-col items-center">
@@ -26,8 +36,8 @@ export function StockControlPage() {
               color="#1a1a1a"
             />
             <StockInfoCard
-              title="Items in stock"
-              value={3000}
+              title="Stock total value"
+              value={totalValue}
               color="#1a1a1a"
             />
             <StockInfoCard

@@ -16,6 +16,7 @@ import { DotsThree, MagnifyingGlass, Pencil, Trash } from "phosphor-react";
 import clsx from "clsx";
 import { ModalDelete } from "../../../components/Modal/ModalDelete";
 import { Product } from "../../../interfaces/ProductInterface";
+import { ModalItem } from "../StockControl/ModalItem";
 
 interface ProductTableProps {
   products: Array<Product>;
@@ -27,6 +28,7 @@ export const ProductList: React.FunctionComponent<ProductTableProps> = (
   props
 ) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModalSizesVisible, setisModalSizesVisible] = useState(false);
   const [productSelected, setProductSelected] = useState<Product | null>(null);
   const [filter, setFilter] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -92,10 +94,16 @@ export const ProductList: React.FunctionComponent<ProductTableProps> = (
         <Tbody>
           {productFilter.length > 0 ? (
             productFilter.map((product) => (
-              <Tr key={product.id}>
-                <Td>{product.name}</Td>
+              <Tr key={product.id} cursor={"pointer"}>
+                <Td
+                  onClick={() => {
+                    setProductSelected(product);
+                    setisModalSizesVisible(true);
+                  }}
+                >
+                  {product.name}
+                </Td>
                 <Td>{product.type}</Td>
-
                 <Td>
                   <div
                     style={{
@@ -179,6 +187,31 @@ export const ProductList: React.FunctionComponent<ProductTableProps> = (
             }}
             confirmDelete={() => {
               props.onDelete(productSelected);
+              setIsModalVisible(false);
+              setProductSelected(null);
+            }}
+          />
+        ) : null}
+
+        {isModalVisible && productSelected ? (
+          <ModalDelete
+            text={productSelected.name}
+            onCloseModal={() => {
+              setIsModalVisible(false);
+              setProductSelected(null);
+            }}
+            confirmDelete={() => {
+              props.onDelete(productSelected);
+              setIsModalVisible(false);
+              setProductSelected(null);
+            }}
+          />
+        ) : null}
+
+        {isModalSizesVisible && productSelected ? (
+          <ModalItem
+            product={productSelected}
+            onCloseModal={() => {
               setIsModalVisible(false);
               setProductSelected(null);
             }}

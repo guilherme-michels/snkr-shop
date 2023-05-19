@@ -32,6 +32,18 @@ export function getProducts() {
   return api.get(`/products`).then((res) => res.data);
 }
 
-export function deleteProduct(productId: String) {
+export function deleteProduct(productId: string) {
   return api.delete(`/products/${productId}/delete`).then((res) => res.data);
+}
+
+export function addSizes(productId: string, size: number) {
+  return api.post(`/shoe-sizes`, { productId, size }).then((res) => res.data);
+}
+
+export function removeSizes(productId: string, size: number) {
+  return api.delete(`/shoe-sizes/${productId}/${size}`).then((res) => res.data);
+}
+
+export function getProductSizes(productId: string) {
+  return api.get(`/shoe-sizes/${productId}`).then((res) => res.data);
 }

@@ -5,94 +5,158 @@ import {
   ModalHeader,
   ModalCloseButton,
   ModalBody,
+  useToast,
 } from "@chakra-ui/react";
-import { Check, NotePencil } from "phosphor-react";
-import { useState } from "react";
+import { NotePencil, Trash } from "phosphor-react";
+import { useCallback, useEffect, useState } from "react";
 import { SizeCard } from "./SizeCard";
+import { Product } from "../../../interfaces/ProductInterface";
+import {
+  addSizes,
+  getProductSizes,
+  removeSizes,
+} from "../../../api/product/product.service";
+import { isAxiosError } from "axios";
 
 interface ModalProps {
   onCloseModal: () => void;
+  product: Product;
 }
 
 const sizes = [
   {
     size: 34,
-    quantity: 3,
   },
   {
     size: 35,
-    quantity: 23,
   },
   {
     size: 36,
-    quantity: 3,
   },
   {
     size: 37,
-    quantity: 0,
   },
   {
     size: 38,
-    quantity: 3,
   },
   {
     size: 39,
-    quantity: 73,
   },
   {
     size: 40,
-    quantity: 3,
   },
   {
     size: 41,
-    quantity: 0,
   },
   {
     size: 42,
-    quantity: 5,
   },
   {
     size: 43,
-    quantity: 4,
   },
   {
     size: 44,
-    quantity: 12,
   },
   {
     size: 45,
-    quantity: 3,
   },
   {
     size: 46,
-    quantity: 2,
   },
   {
     size: 47,
-    quantity: 1,
   },
 
   {
     size: 48,
-    quantity: 0,
   },
 ];
 
-export const ModalItem = ({ onCloseModal }: ModalProps) => {
-  const [sizeQuantity, setSizeQuantity] = useState(0);
-  const [size, setSize] = useState(0);
-  const [viewSizeQuantity, setViewSizeQuantity] = useState(false);
+export const ModalItem = ({ onCloseModal, product }: ModalProps) => {
+  const toast = useToast();
+  const [availableSizes, setAvailableSizes] = useState<number[]>([]);
 
-  function quantity(quant: number, size: number) {
-    setSizeQuantity(quant);
-    setSize(size);
+  const onAddSize = async (productId: string, size: number) => {
+    try {
+      await addSizes(productId, size);
+      fetchProductSizes();
+      toast({
+        position: "top-right",
+        description: `Size ${size} added to stock`,
+        status: "success",
+        duration: 4000,
+        isClosable: true,
+      });
+    } catch (error) {
+      if (isAxiosError(error)) {
+        let errorDescription = "Error while adding size to this product";
 
-    setViewSizeQuantity(true);
-  }
+        if (error.response?.status === 409) {
+          errorDescription = "Shoe size already exists for the product";
+        }
+
+        if (error.response?.status === 404) {
+          errorDescription = "Product not found";
+        }
+
+        toast({
+          position: "top-right",
+          description: errorDescription,
+          status: "error",
+          duration: 4000,
+          isClosable: true,
+        });
+      }
+    }
+  };
+
+  const onDeleteSize = async (productId: string, size: number) => {
+    try {
+      await removeSizes(productId, size);
+      fetchProductSizes();
+      toast({
+        position: "top-right",
+        description: `Size ${size} removed from stock`,
+        status: "success",
+        duration: 4000,
+        isClosable: true,
+      });
+    } catch (error) {
+      if (isAxiosError(error)) {
+        let errorDescription = "Error while removing size to this product";
+
+        if (error.response?.status === 404) {
+          errorDescription = "Product not found";
+        }
+
+        toast({
+          position: "top-right",
+          description: errorDescription,
+          status: "error",
+          duration: 4000,
+          isClosable: true,
+        });
+      }
+    }
+  };
+
+  const fetchProductSizes = useCallback(() => {
+    getProductSizes(product.id).then((data) => {
+      setAvailableSizes(
+        data.sizes
+          .filter((size: any) => size.quantity > 0)
+          .map((size: any) => size.size)
+      );
+    });
+  }, [product]);
+
+  useEffect(() => {
+    fetchProductSizes();
+  }, [fetchProductSizes]);
 
   return (
     <Modal
-      closeOnOverlayClick={false}
+      closeOnOverlayClick={true}
       isOpen={true}
       onClose={onCloseModal}
       size={"5xl"}
@@ -102,7 +166,7 @@ export const ModalItem = ({ onCloseModal }: ModalProps) => {
       <form>
         <ModalContent className="h-2/3">
           <ModalHeader className="bg-zinc-300 text-zinc-700">
-            <strong className="text-2xl">Jordan 1</strong>
+            <strong className="text-2xl">{product.name}</strong>
           </ModalHeader>
           <ModalCloseButton color={"#aeaeae"} />
 
@@ -114,8 +178,8 @@ export const ModalItem = ({ onCloseModal }: ModalProps) => {
               <div className="h-full w-2/5 flex flex-col text-zinc-700 items-center">
                 <div className="flex items-center justify-between w-full">
                   <div className="flex flex-col items-center ml-10">
-                    <strong className="text-base">Air Jordan 1 Low</strong>
-                    <strong className="text-3xl mt-1">Cardinal Red</strong>
+                    <strong className="text-base">{product.name}</strong>
+                    <strong className="text-3xl mt-1">{product.type}</strong>
                   </div>
                   <div>
                     <NotePencil
@@ -127,33 +191,26 @@ export const ModalItem = ({ onCloseModal }: ModalProps) => {
 
                 <div className="grid grid-cols-5 grid-flow-row gap-14 mt-10 w-4/5">
                   {sizes.map((size) => (
-                    <div
-                      key={size.size}
-                      onClick={() => quantity(size.quantity, size.size)}
-                    >
-                      <SizeCard
-                        inStock={size.quantity != 0}
-                        value={size.size}
-                      />
+                    <div key={size.size}>
+                      <div
+                        onClick={() => onAddSize(product.id, size.size)}
+                        className="flex flex-col items-center"
+                      >
+                        <SizeCard
+                          value={size.size}
+                          inStock={availableSizes.includes(size.size)}
+                        />
+                      </div>
+                      {availableSizes.includes(size.size) ? (
+                        <Trash
+                          onClick={() => onDeleteSize(product.id, size.size)}
+                          className="mt-2 cursor-pointer hover:opacity-75"
+                          size={16}
+                        />
+                      ) : null}
                     </div>
                   ))}
                 </div>
-
-                {viewSizeQuantity ? (
-                  <div className="mt-14 flex items-center">
-                    <span className="font-bold">({size}) SIZE QUANTITY: </span>
-                    <input
-                      type="text"
-                      className="bg-transparent border-[1px] border-white p-1 placeholder:text-zinc-700 ml-2 w-20 mr-2 rounded cursor-pointer"
-                      value={sizeQuantity}
-                    />
-                    <Check
-                      size={30}
-                      className="text-green hover:animate-pulse cursor-pointer"
-                      onClick={() => setViewSizeQuantity(false)}
-                    />
-                  </div>
-                ) : null}
               </div>
             </div>
           </ModalBody>

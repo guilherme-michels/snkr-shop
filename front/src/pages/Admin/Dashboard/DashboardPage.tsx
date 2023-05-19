@@ -5,12 +5,12 @@ export function DashboardPage() {
   return (
     <div className="h-full flex flex-col items-center">
       <div className="flex w-[70%] justify-between">
-        <DashboardCard title={"NPS"} chart={false} nps={90} />
+        <DashboardCard title={"NPS"} chart={false} nps={100} />
 
         <DashboardCard
-          expected={543200}
-          reached={28000}
-          title={"Completed sales"}
+          expected={120}
+          reached={35}
+          title={"Week sales"}
           chart
           chartColor="#b3b3b3"
         />

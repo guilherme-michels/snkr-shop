@@ -128,12 +128,13 @@ export function AddProduct() {
             </div>
           </div>
 
-          <div className="grid grid-flow-row gap-14">
+          <div className="grid grid-cols-2 grid-flow-row gap-14">
             <div className="mt-3 flex flex-col">
               <label>Image *</label>
 
               <input type="file" onChange={handleFileChange} />
             </div>
+
             <div className="mt-3">
               <label>Code *</label>
               <input

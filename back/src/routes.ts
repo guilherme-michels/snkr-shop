@@ -4,11 +4,8 @@ import { prisma } from "./lib/prisma";
 import jwt from "jsonwebtoken";
 import fs from "fs";
 import { validateJwt } from "./middlewares/auth";
-import multer from "fastify-multer";
-import path from "path";
 import mime from "mime-types";
 import { v4 as uuid } from "uuid";
-
 import util from "util";
 import { pipeline } from "stream";
 const pump = util.promisify(pipeline);
@@ -117,6 +114,119 @@ export async function appRoutes(app: FastifyInstance) {
     }
   );
 
+  app.get("/shoe-sizes/:productId", async (request: any, response) => {
+    const { productId } = request.params;
+
+    try {
+      const productExists = await prisma.product.findUnique({
+        where: { id: productId },
+      });
+
+      if (!productExists) {
+        return response.status(404).send({ error: "Product not found" });
+      }
+
+      const sizes = await prisma.shoeSize.findMany({
+        where: { productId },
+      });
+
+      return { sizes };
+    } catch (error) {
+      return response
+        .status(500)
+        .send({ error: "Error while retrieving shoe size" });
+    }
+  });
+
+  app.delete(
+    "/shoe-sizes/:productId/:size",
+    { preHandler: [validateJwt] },
+    async (req: any, response) => {
+      const productId = req.params.productId;
+      const size = req.params.size;
+
+      try {
+        const productExists = await prisma.product.findUnique({
+          where: { id: productId },
+        });
+
+        if (!productExists) {
+          return response.status(404).send({ error: "Product not found" });
+        }
+
+        const existingShoeSize = await prisma.shoeSize.findFirst({
+          where: {
+            productId: productId,
+            size: Number(size),
+          },
+        });
+
+        console.log(existingShoeSize, "DSAHDHUASHUASDHUASDHU");
+
+        if (!existingShoeSize) {
+          return response.status(404).send({ error: "Shoe size not found" });
+        }
+
+        await prisma.shoeSize.delete({
+          where: { id: existingShoeSize.id },
+        });
+
+        return response.send({ message: "Shoe size deleted successfully" });
+      } catch (error) {
+        return response
+          .status(500)
+          .send({ error: "Error while deleting shoe size" });
+      }
+    }
+  );
+
+  app.post(
+    "/shoe-sizes",
+    { preHandler: [validateJwt] },
+    async (request: any, response) => {
+      const createShoeSize = z.object({
+        productId: z.string(),
+        size: z.number(),
+      });
+
+      const { productId, size } = createShoeSize.parse(request.body);
+
+      try {
+        const productExists = await prisma.product.findUnique({
+          where: { id: productId },
+        });
+
+        if (!productExists) {
+          return response.status(404).send({ error: "Product not found" });
+        }
+
+        const existingShoeSize = await prisma.shoeSize.findFirst({
+          where: { productId, size },
+        });
+
+        if (existingShoeSize) {
+          return response
+            .status(409)
+            .send({ error: "Shoe size already exists for the product" });
+        }
+
+        const newShoeSize = await prisma.shoeSize.create({
+          data: {
+            productId,
+            size,
+            quantity: 1,
+          },
+        });
+
+        return newShoeSize;
+      } catch (error) {
+        return response
+          .status(500)
+          .send({ error: "Error while creating shoe size" });
+      }
+    }
+  );
+
   app.get("/products", { preHandler: [validateJwt] }, async (req, res) => {
     try {
       const products = await prisma.product.findMany();
@@ -150,6 +260,7 @@ export async function appRoutes(app: FastifyInstance) {
 
   app.get(`/file`, async (request, reply) => {
     const file = fs.readFileSync(`./images/${(request.query as any).image}`);
+    reply.type("image/jpeg");
     return (reply as any).sendFile((request.query as any).image);
   });
 
@@ -272,6 +383,16 @@ export async function appRoutes(app: FastifyInstance) {
             phone,
             cpf,
             dateBirth,
+          },
+        });
+
+        await prisma.cart.create({
+          data: {
+            user: {
+              connect: {
+                id: newPerson.id,
+              },
+            },
           },
         });
 
@@ -399,7 +520,9 @@ export async function appRoutes(app: FastifyInstance) {
     async (req: any, res) => {
       const productId = req.params.id;
       const userId = req.user.id;
-      const size = req.body as number;
+      const size = req.body;
+      const keys = Object.keys(size);
+      const valueSize = keys[0];
 
       try {
         const userCart = await prisma.cart.findFirst({
@@ -416,6 +539,7 @@ export async function appRoutes(app: FastifyInstance) {
           where: {
             cartId: userCart.id,
             productId,
+            size: Number(valueSize),
           },
         });
 
@@ -428,7 +552,7 @@ export async function appRoutes(app: FastifyInstance) {
             quantity: 1,
             cartId: userCart.id,
             productId,
-            size: size,
+            size: Number(valueSize),
           },
         });
 

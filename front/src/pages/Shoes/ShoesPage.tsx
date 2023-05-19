@@ -10,7 +10,6 @@ import { Link } from "react-router-dom";
 
 export function ShoesPage() {
   const [products, setProducts] = useState<Product[]>([]);
-  const toast = useToast();
 
   const fetchProducts = async () => {
     const newProducts = await getProducts();
@@ -20,28 +19,6 @@ export function ShoesPage() {
   useEffect(() => {
     fetchProducts();
   }, []);
-
-  const onAddProductPersonCart = async (productId: string) => {
-    try {
-      await addProductPersonCart(productId, 42);
-      toast({
-        position: "top-right",
-        description: "Product added to cart",
-        status: "success",
-        duration: 1000,
-        isClosable: true,
-      });
-      fetchProducts();
-    } catch (err) {
-      toast({
-        position: "top-right",
-        description: "Oops, this product is already in your cart",
-        status: "error",
-        duration: 1000,
-        isClosable: true,
-      });
-    }
-  };
 
   return (
     <HeaderTemplate>
@@ -53,18 +30,15 @@ export function ShoesPage() {
                 <div key={product.id}>
                   <Link to={`/shoes/${product.id}/see`}>
                     <div
-                      className="w-[200px] h-[200px] flex items-end p-4 cursor-pointer bg-[#f8f8f8] shadow-md shadow-zinc-400 hover:shadow-zinc-500 transition-all"
+                      className="w-[200px] h-[200px] flex items-end p-4 bg-[#f8f8f8] shadow-md shadow-zinc-400 hover:shadow-zinc-500 transition-all"
                       style={{
                         backgroundImage: `url(${courtPurple})`,
                         backgroundSize: "contain",
                         backgroundRepeat: "no-repeat",
                       }}
                     >
-                      <strong
-                        className="bg-zinc-500 hover:opacity-80 transition-all text-white p-1 text-sm rounded flex items-center"
-                        onClick={() => onAddProductPersonCart(product.id)}
-                      >
-                        Add to cart
+                      <strong className="cursor-pointer bg-zinc-500 hover:opacity-80 transition-all text-white p-1 text-sm rounded flex items-center">
+                        View
                         <ShoppingCart color="#fff" size={16} className="ml-2" />
                       </strong>
                     </div>
