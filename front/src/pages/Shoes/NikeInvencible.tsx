@@ -24,8 +24,8 @@ export function NikeInvenciblePage() {
                 your next run feeling ready and refreshed.
               </span>
             </div>
-            <div className="text-2xl font-extrabold w-1/2 flex items-center justify-center">
-              <span className="bg-green p-8 rounded-2xl text-zinc-100 w-1/2 flex items-center justify-center cursor-pointer hover:opacity-80 transition-all">
+            <div className="text-xl font-extrabold w-1/2 flex items-center justify-center">
+              <span className="bg-green p-4 rounded-2xl text-zinc-100 w-1/3 flex items-center justify-center cursor-pointer hover:opacity-80 transition-all">
                 Buy now
               </span>
             </div>

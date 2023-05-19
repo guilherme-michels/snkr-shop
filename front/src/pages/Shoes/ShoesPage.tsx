@@ -6,6 +6,7 @@ import { getProducts } from "../../api/product/product.service";
 import { Product } from "../../interfaces/ProductInterface";
 import { addProductPersonCart } from "../../api/person/person.service";
 import { useToast } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
 
 export function ShoesPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -22,7 +23,7 @@ export function ShoesPage() {
 
   const onAddProductPersonCart = async (productId: string) => {
     try {
-      await addProductPersonCart(productId);
+      await addProductPersonCart(productId, 42);
       toast({
         position: "top-right",
         description: "Product added to cart",
@@ -50,34 +51,36 @@ export function ShoesPage() {
             <>
               {products.map((product) => (
                 <div key={product.id}>
-                  <div
-                    className="w-[200px] h-[200px] flex items-end p-4 cursor-pointer bg-[#f8f8f8] shadow-md shadow-zinc-400 hover:shadow-zinc-500 transition-all"
-                    style={{
-                      backgroundImage: `url(${courtPurple})`,
-                      backgroundSize: "contain",
-                      backgroundRepeat: "no-repeat",
-                    }}
-                  >
-                    <strong
-                      className="bg-zinc-500 hover:opacity-80 transition-all text-white p-1 text-sm rounded flex items-center"
-                      onClick={() => onAddProductPersonCart(product.id)}
+                  <Link to={`/shoes/${product.id}/see`}>
+                    <div
+                      className="w-[200px] h-[200px] flex items-end p-4 cursor-pointer bg-[#f8f8f8] shadow-md shadow-zinc-400 hover:shadow-zinc-500 transition-all"
+                      style={{
+                        backgroundImage: `url(${courtPurple})`,
+                        backgroundSize: "contain",
+                        backgroundRepeat: "no-repeat",
+                      }}
                     >
-                      Add to cart
-                      <ShoppingCart color="#fff" size={16} className="ml-2" />
-                    </strong>
-                  </div>
-                  <div className="p-1 flex flex-col">
-                    <strong className="text-base">{product.name}</strong>
-                    <span className="text-sm text-zinc-500">
-                      {product.type}
-                    </span>
-                    <span>U$ {product.price}</span>
-                  </div>
+                      <strong
+                        className="bg-zinc-500 hover:opacity-80 transition-all text-white p-1 text-sm rounded flex items-center"
+                        onClick={() => onAddProductPersonCart(product.id)}
+                      >
+                        Add to cart
+                        <ShoppingCart color="#fff" size={16} className="ml-2" />
+                      </strong>
+                    </div>
+                    <div className="p-1 flex flex-col">
+                      <strong className="text-base">{product.name}</strong>
+                      <span className="text-sm text-zinc-500">
+                        {product.type}
+                      </span>
+                      <span>U$ {product.price}</span>
+                    </div>
+                  </Link>
                 </div>
               ))}
             </>
           ) : (
-            <div className="flex text-2xl w-full justify-center items-center mt-10">
+            <div className="absolute text-2xl left-1/3 w-1/3 text-center">
               How empty! It looks like this page doesn't have any products, come
               back later...
             </div>

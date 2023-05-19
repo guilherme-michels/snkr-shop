@@ -62,6 +62,8 @@ export function deleteProductPersonCart(productId: string) {
   return api.delete(`/person/cart/${productId}/delete`).then((res) => res.data);
 }
 
-export function addProductPersonCart(productId: string) {
-  return api.post(`/person/cart/${productId}/store`).then((res) => res.data);
+export function addProductPersonCart(productId: string, size: number) {
+  return api
+    .post(`/person/cart/${productId}/store`, size)
+    .then((res) => res.data);
 }

@@ -15,18 +15,22 @@ datasource db {
 }
 
 model Product {
-  id        String     @id @unique @default(uuid())
-  name      String
-  code      String
-  price     String
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  type      String
-  sizes     ShoeSize[]
-  cartItems CartItem[]
-  Cart      Cart?      @relation(fields: [cartId], references: [id])
-  cartId    String?
-  image     String
+  id           String      @id @unique @default(uuid())
+  name         String
+  code         String
+  price        String
+  description  String
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  type         String
+  image        String
+  sizes        ShoeSize[]
+  cartItems    CartItem[]
+  Cart         Cart?       @relation(fields: [cartId], references: [id])
+  cartId       String?
+  Sales        Sales[]
+  BestSeller   BestSeller? @relation(fields: [bestSellerId], references: [id])
+  bestSellerId Int?
 }
 
 model User {
@@ -61,6 +65,7 @@ model CartItem {
   cart      Cart?    @relation(fields: [cartId], references: [id])
   productId String
   cartId    String
+  size      Int
 }
 
 model Cart {
@@ -71,4 +76,17 @@ model Cart {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   CartItem  CartItem[]
+}
+
+model Sales {
+  id        Int      @id @default(autoincrement())
+  valor     Float
+  data      DateTime @default(now())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+}
+
+model BestSeller {
+  id       Int       @id @default(autoincrement())
+  products Product[]
 }

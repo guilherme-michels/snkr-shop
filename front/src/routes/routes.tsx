@@ -18,8 +18,7 @@ export function AppRoutes() {
       <Route path="/" element={<LandingPage />} />
 
       <Route path="/shoes" element={<ShoesPage />} />
-      <Route path="/shoe/1" element={<ShoePage />} />
-      <Route path="/shoes/:id/buy" element={<ShoePage />} />
+      <Route path="/shoes/:id/see" element={<ShoePage />} />
 
       <Route path="/shoes/nike-invencible" element={<NikeInvenciblePage />} />
     </ReactRoutes>

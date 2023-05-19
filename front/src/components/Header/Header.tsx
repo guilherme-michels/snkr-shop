@@ -13,6 +13,7 @@ import {
 } from "@chakra-ui/react";
 import {
   ChartLine,
+  Fire,
   MagnifyingGlass,
   ShoppingCart,
   UserCircle,
@@ -41,7 +42,10 @@ export function Header() {
       </div>
       <div>
         <Link to="/">
-          <strong className="text-white">SNKR SHOP</strong>
+          <strong className="text-white font-extrabold text-4xl flex items-center justify-center">
+            SNKR SHOP
+            <Fire size={48} className="ml-4" />
+          </strong>
         </Link>
       </div>
       <div>
@@ -104,9 +108,11 @@ export function Header() {
                 <UserCart />
               </DrawerBody>
               <DrawerFooter className="flex items-center bg-zinc-100">
-                <button className="bg-zinc-900 hover:opacity-[90%] transition-all w-full p-1 text-white">
-                  End purchase
-                </button>
+                <Link to={"/"}>
+                  <button className="bg-zinc-900 hover:opacity-[90%] transition-all w-full p-1 text-white">
+                    End purchase
+                  </button>
+                </Link>
               </DrawerFooter>
             </DrawerContent>
           </Drawer>

@@ -52,8 +52,6 @@ export function Login() {
       }
     } catch (err: any) {
       console.log(err);
-
-      const errorResponse = err.response;
     }
   };
 

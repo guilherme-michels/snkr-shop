@@ -4,12 +4,15 @@ CREATE TABLE "Product" (
     "name" TEXT NOT NULL,
     "code" TEXT NOT NULL,
     "price" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,
     "type" TEXT NOT NULL,
-    "cartId" TEXT,
     "image" TEXT NOT NULL,
-    CONSTRAINT "Product_cartId_fkey" FOREIGN KEY ("cartId") REFERENCES "Cart" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+    "cartId" TEXT,
+    "bestSellerId" INTEGER,
+    CONSTRAINT "Product_cartId_fkey" FOREIGN KEY ("cartId") REFERENCES "Cart" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT "Product_bestSellerId_fkey" FOREIGN KEY ("bestSellerId") REFERENCES "BestSeller" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 -- CreateTable
@@ -44,6 +47,7 @@ CREATE TABLE "CartItem" (
     "quantity" INTEGER NOT NULL,
     "productId" TEXT NOT NULL,
     "cartId" TEXT NOT NULL,
+    "size" INTEGER NOT NULL,
     CONSTRAINT "CartItem_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT "CartItem_cartId_fkey" FOREIGN KEY ("cartId") REFERENCES "Cart" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
@@ -55,6 +59,20 @@ CREATE TABLE "Cart" (
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,
     CONSTRAINT "Cart_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Sales" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "valor" REAL NOT NULL,
+    "data" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "productId" TEXT NOT NULL,
+    CONSTRAINT "Sales_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "BestSeller" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
 );
 
 -- CreateIndex

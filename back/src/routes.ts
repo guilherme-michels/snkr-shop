@@ -7,6 +7,11 @@ import { validateJwt } from "./middlewares/auth";
 import multer from "fastify-multer";
 import path from "path";
 import mime from "mime-types";
+import { v4 as uuid } from "uuid";
+
+import util from "util";
+import { pipeline } from "stream";
+const pump = util.promisify(pipeline);
 
 interface LoginData {
   email: string;
@@ -50,28 +55,30 @@ export async function appRoutes(app: FastifyInstance) {
     { preHandler: [validateJwt] },
     async (request, response) => {
       const data = await (request as any).file();
-      console.log("grandssse hora", data.fields);
 
       const body = {
         name: data.fields.name.value,
         type: data.fields.name.value,
-        price: Number(data.fields.name.value),
+        price: data.fields.name.value,
         code: data.fields.name.value,
+        description: data.fields.name.value,
       };
 
-      console.log(`bodyddydd`, body);
+      console.log(`data mime type`, data.mimetype);
+
+      const filename = uuid() + `.` + mime.extension(data.mimetype);
+      await pump(data.file, fs.createWriteStream(`./images/${filename}`));
 
       const createProduct = z.object({
         name: z.string(),
         type: z.string(),
         price: z.string(),
         code: z.string(),
-        imageFile: z.any(),
+        description: z.string(),
       });
 
-      const { name, type, code, price, imageFile } = createProduct.parse(
-        request.body
-      );
+      const { name, type, code, price, description } =
+        createProduct.parse(body);
 
       try {
         const productAlreadyExists = await prisma.product.findFirst({
@@ -96,11 +103,12 @@ export async function appRoutes(app: FastifyInstance) {
             name,
             type,
             price,
-            image: "123.jpg",
+            description,
+            image: filename,
           },
         });
 
-        return response.send();
+        return newProduct;
       } catch (error) {
         return response
           .status(500)
@@ -140,53 +148,82 @@ export async function appRoutes(app: FastifyInstance) {
     }
   );
 
-  app.put(
-    "/product/:id/edit",
-    { preHandler: [validateJwt] },
-    async (req: any, res) => {
-      const { id } = req.params;
+  app.get(`/file`, async (request, reply) => {
+    const file = fs.readFileSync(`./images/${(request.query as any).image}`);
+    return (reply as any).sendFile((request.query as any).image);
+  });
 
-      try {
-        const updatedProduct = await prisma.user.update({
-          where: {
-            id: req.id,
-          },
-          data: {
-            firstName: req.firstName,
-            lastName: req.lastName,
-            email: req.email,
-            password: req.password,
-            position: req.position,
-            phone: req.phone,
-            cpf: req.cpf,
-            dateBirth: req.dateBirth,
-          },
-        });
+  // app.put(
+  //   "/product/:id/edit",
+  //   { preHandler: [validateJwt] },
+  //   async (req: any, res) => {
+  //     const { id } = req.params;
 
-        res.send(updatedProduct);
-      } catch (error) {
-        res.status(500).send({ error: "Error edit product" });
-      }
-    }
-  );
+  //     try {
+  //       const updatedProduct = await prisma.user.update({
+  //         where: {
+  //           id: req.id,
+  //         },
+  //         data: {
+  //           firstName: req.firstName,
+  //           lastName: req.lastName,
+  //           email: req.email,
+  //           password: req.password,
+  //           position: req.position,
+  //           phone: req.phone,
+  //           cpf: req.cpf,
+  //           dateBirth: req.dateBirth,
+  //         },
+  //       });
 
-  app.get("/product/:id/show", async (req, res) => {
-    const id = req.params;
+  //       res.send(updatedProduct);
+  //     } catch (error) {
+  //       res.status(500).send({ error: "Error edit product" });
+  //     }
+  //   }
+  // );
+
+  app.get("/products/:id/show", async (req: any, reply) => {
+    const { id } = req.params;
 
     try {
       const product = await prisma.product.findUnique({
         where: {
-          id: req.id,
+          id: id,
         },
       });
 
       if (!product) {
-        return console.log({ error: "Product not found" });
+        return reply.status(404).send({ error: "Product not found" });
       }
 
-      return res.send(product);
+      return reply.send(product);
     } catch (error) {
-      return res.status(500).send({ error: "Error searching product" });
+      return reply.status(500).send({ error: "Error searching product" });
+    }
+  });
+
+  app.get("/sales", async (request, response) => {
+    try {
+      const currentDate = new Date();
+      const lastWeek = new Date();
+      lastWeek.setDate(currentDate.getDate() - 7);
+
+      const sales = await prisma.sales.findMany({
+        where: {
+          data: {
+            gte: lastWeek,
+            lte: currentDate,
+          },
+        },
+        include: {
+          product: true,
+        },
+      });
+
+      response.send(sales);
+    } catch (error) {
+      response.status(500).send("Error getting sales");
     }
   });
 
@@ -362,6 +399,7 @@ export async function appRoutes(app: FastifyInstance) {
     async (req: any, res) => {
       const productId = req.params.id;
       const userId = req.user.id;
+      const size = req.body as number;
 
       try {
         const userCart = await prisma.cart.findFirst({
@@ -390,6 +428,7 @@ export async function appRoutes(app: FastifyInstance) {
             quantity: 1,
             cartId: userCart.id,
             productId,
+            size: size,
           },
         });
 
@@ -399,30 +438,4 @@ export async function appRoutes(app: FastifyInstance) {
       }
     }
   );
-
-  // app.get("/file/:id/show", async (req: any, res) => {
-  //   const id = req.params;
-
-  //   try {
-  //     const product = await prisma.product.findUnique({
-  //       where: {
-  //         id: id,
-  //       },
-  //     });
-
-  //     if (!product) {
-  //       return res
-  //         .status(404)
-  //         .send({ message: `Product with id ${id} was not found` });
-  //     }
-
-  //     const data = fs.readFileSync(
-  //       join(__dirname, "..", "images", product?.attachmentEquip)
-  //     );
-
-  //     return res.send(data);
-  //   } catch (error) {
-  //     return res.status(500).send({ error: "Error searching equipment" });
-  //   }
-  // });
 }

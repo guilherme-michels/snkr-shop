@@ -12,6 +12,7 @@ const addProductSchema = z.object({
   type: z.string().min(3),
   price: z.number(),
   code: z.string().min(3),
+  description: z.string(),
 });
 
 type AddProductData = z.infer<typeof addProductSchema>;
@@ -26,6 +27,7 @@ export function AddProduct() {
       type: "",
       price: 0,
       code: "",
+      description: "",
     },
     shouldUseNativeValidation: true,
     resolver: zodResolver(addProductSchema),
@@ -116,12 +118,12 @@ export function AddProduct() {
             </div>
 
             <div className="mt-3">
-              <label>Code *</label>
+              <label>Description *</label>
               <input
-                type="code"
-                placeholder="Code"
+                type="text"
+                placeholder="Description"
                 className="w-full p-3 mt-1 rounded-lg placeholder:text-zinc-400 border-[1px] border-zinc-500"
-                {...register("code")}
+                {...register("description")}
               />
             </div>
           </div>
@@ -131,6 +133,15 @@ export function AddProduct() {
               <label>Image *</label>
 
               <input type="file" onChange={handleFileChange} />
+            </div>
+            <div className="mt-3">
+              <label>Code *</label>
+              <input
+                type="code"
+                placeholder="Code"
+                className="w-full p-3 mt-1 rounded-lg placeholder:text-zinc-400 border-[1px] border-zinc-500"
+                {...register("code")}
+              />
             </div>
           </div>
 

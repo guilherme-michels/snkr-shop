@@ -4,7 +4,7 @@ export interface Product {
   code: string;
   price: number;
   id: string;
-  image: string;
+  // image: string;
 }
 
 export type AddProductPayload = Omit<Product, "id" | "image">;
