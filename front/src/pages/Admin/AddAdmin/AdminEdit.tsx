@@ -44,7 +44,6 @@ export function AdminEdit() {
         id: params.id,
       });
 
-      console.log();
       toast({
         description: "User successfully edited.",
         status: "success",

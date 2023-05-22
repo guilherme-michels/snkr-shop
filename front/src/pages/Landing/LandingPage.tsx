@@ -3,17 +3,20 @@ import runBoostMp4 from "../../assets/runboost.mp4";
 import jordan from "../../assets/jordan.png";
 import nikeRunning from "../../assets/nike-running.png";
 import streetWear from "../../assets/streetwear.png";
-import courtPurple from "../../assets/court_purple.jpg";
 
-import { ShoppingCart, Trophy } from "phosphor-react";
+import { Trophy } from "phosphor-react";
 import { Link } from "react-router-dom";
 import { Footer } from "../../components/Footer/Footer";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { Product } from "../../interfaces/ProductInterface";
+import { ShoeCard } from "../Shoes/ShoeCard";
+import { getBestSeller } from "../../api/product/product.service";
 
 export function LandingPage() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [bestSellers, setBestSellers] = useState<Product[]>([]);
 
   const images = [
     "https://imgnike-a.akamaihd.net/1920x1920/026282MT.jpg",
@@ -32,19 +35,18 @@ export function LandingPage() {
       );
     }, 5000);
 
+    fetchBestSellers();
     return () => clearInterval(interval);
   }, []);
 
-  const handlePrev = () => {
-    setActiveIndex((prevIndex) =>
-      prevIndex === 0 ? images.length - 1 : prevIndex - 1
-    );
-  };
+  const fetchBestSellers = async () => {
+    const bestSellers = await getBestSeller();
 
-  const handleNext = () => {
-    setActiveIndex((prevIndex) =>
-      prevIndex === images.length - 1 ? 0 : prevIndex + 1
-    );
+    const shuffledBestSellers = bestSellers.sort(() => Math.random() - 0.5);
+
+    const randomBestSellers = shuffledBestSellers.slice(0, 5);
+
+    setBestSellers(randomBestSellers);
   };
 
   return (
@@ -79,17 +81,19 @@ export function LandingPage() {
 
         <div className="flex items-center w-full justify-center">
           <div className="grid grid-cols-3 grid-flow-row gap-2 mt-16 w-[65%]">
-            <div
-              className="w-full h-[500px] rounded flex items-end p-4 cursor-pointer hover:scale-[102%] transition-all"
-              style={{
-                backgroundImage: `url(${jordan})`,
-                backgroundSize: "cover",
-              }}
-            >
-              <strong className="bg-white p-2 rounded-2xl text-sm text-zinc-900">
-                Snkrs
-              </strong>
-            </div>
+            <Link to="/shoes">
+              <div
+                className="w-full h-[500px] rounded flex items-end p-4 cursor-pointer hover:scale-[102%] transition-all"
+                style={{
+                  backgroundImage: `url(${jordan})`,
+                  backgroundSize: "cover",
+                }}
+              >
+                <strong className="bg-white p-2 rounded-2xl text-sm text-zinc-900">
+                  Snkrs
+                </strong>
+              </div>
+            </Link>
             <div
               className="w-full h-[500px] rounded flex items-end p-4 cursor-pointer hover:scale-[102%] transition-all"
               style={{
@@ -130,7 +134,7 @@ export function LandingPage() {
           </div>
         </div>
 
-        <div className="flex items-center w-full justify-center bg-gradient-to-r from-[#e2e2e2] via-[#fff] to-[#e2e2e2]">
+        <div className="flex items-center w-full justify-center bg-gradient-to-r from-[#e2e2e2] via-[#fff] to-[#e2e2e2] mb-20">
           <div
             style={{
               width: "35%",
@@ -175,116 +179,29 @@ export function LandingPage() {
           </div>
         </div>
 
-        <div className="flex items-center w-full justify-center flex-col mt-20">
-          <strong className="text-zinc-500 text-base flex items-center">
-            BEST SELLERS
-            <Trophy className="#828282 ml-2" size={22} />
-          </strong>
-        </div>
-        <div className="flex items-center w-full justify-center">
-          <div className="grid grid-cols-5 grid-flow-row gap-4 mt-4 w-[65%] mb-32">
-            <div>
-              <div
-                className="w-full h-[200px] flex items-end p-4 cursor-pointer bg-[#f8f8f8] shadow-md shadow-zinc-400 hover:shadow-zinc-500 transition-all"
-                style={{
-                  backgroundImage: `url(${courtPurple})`,
-                  backgroundSize: "contain",
-                  backgroundRepeat: "no-repeat",
-                }}
-              >
-                <strong className="bg-zinc-500 hover:opacity-80 transition-all text-white p-1 text-sm rounded flex items-center">
-                  Buy
-                  <ShoppingCart color="#fff" size={16} className="ml-2" />
-                </strong>
-              </div>
-              <div className="p-1 flex flex-col">
-                <strong className="text-base">Nike Court Purple</strong>
-                <span className="text-sm text-zinc-500">Sneakers</span>
-                <span>U$ 1400,00</span>
+        {bestSellers.length > 0 ? (
+          <>
+            <div className="flex items-center w-full justify-center flex-col">
+              <strong className="text-zinc-500 text-base flex items-center">
+                BEST SELLERS
+                <Trophy className="#828282 ml-2" size={22} />
+              </strong>
+            </div>
+
+            <div className="flex items-center w-full justify-center">
+              <div className="flex mt-4 w-[65%] mb-10 ">
+                <div className="flex">
+                  {bestSellers.map((bestSeller) => (
+                    <div key={bestSeller.id} className="ml-4">
+                      <ShoeCard product={bestSeller} />
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-            <div>
-              <div
-                className="w-full h-[200px] flex items-end p-4 cursor-pointer bg-[#f8f8f8] shadow-md shadow-zinc-400 hover:shadow-zinc-500 transition-all"
-                style={{
-                  backgroundImage: `url(${courtPurple})`,
-                  backgroundSize: "contain",
-                  backgroundRepeat: "no-repeat",
-                }}
-              >
-                <strong className="bg-zinc-500 hover:opacity-80 transition-all text-white p-1 text-sm rounded flex items-center">
-                  Buy
-                  <ShoppingCart color="#fff" size={16} className="ml-2" />
-                </strong>
-              </div>
-              <div className="p-1 flex flex-col">
-                <strong className="text-base">Nike Court Purple</strong>
-                <span className="text-sm text-zinc-500">Sneakers</span>
-                <span>U$ 1400,00</span>
-              </div>
-            </div>
-            <div>
-              <div
-                className="w-full h-[200px] flex items-end p-4 cursor-pointer bg-[#f8f8f8] shadow-md shadow-zinc-400 hover:shadow-zinc-500 transition-all"
-                style={{
-                  backgroundImage: `url(${courtPurple})`,
-                  backgroundSize: "contain",
-                  backgroundRepeat: "no-repeat",
-                }}
-              >
-                <strong className="bg-zinc-500 hover:opacity-80 transition-all text-white p-1 text-sm rounded flex items-center">
-                  Buy
-                  <ShoppingCart color="#fff" size={16} className="ml-2" />
-                </strong>
-              </div>
-              <div className="p-1 flex flex-col">
-                <strong className="text-base">Nike Court Purple</strong>
-                <span className="text-sm text-zinc-500">Sneakers</span>
-                <span>U$ 1400,00</span>
-              </div>
-            </div>
-            <div>
-              <div
-                className="w-full h-[200px] flex items-end p-4 cursor-pointer bg-[#f8f8f8] shadow-md shadow-zinc-400 hover:shadow-zinc-500 transition-all"
-                style={{
-                  backgroundImage: `url(${courtPurple})`,
-                  backgroundSize: "contain",
-                  backgroundRepeat: "no-repeat",
-                }}
-              >
-                <strong className="bg-zinc-500 hover:opacity-80 transition-all text-white p-1 text-sm rounded flex items-center">
-                  Buy
-                  <ShoppingCart color="#fff" size={16} className="ml-2" />
-                </strong>
-              </div>
-              <div className="p-1 flex flex-col">
-                <strong className="text-base">Nike Court Purple</strong>
-                <span className="text-sm text-zinc-500">Sneakers</span>
-                <span>U$ 1400,00</span>
-              </div>
-            </div>
-            <div>
-              <div
-                className="w-full h-[200px] flex items-end p-4 cursor-pointer bg-[#f8f8f8] shadow-md shadow-zinc-400 hover:shadow-zinc-500 transition-all"
-                style={{
-                  backgroundImage: `url(${courtPurple})`,
-                  backgroundSize: "contain",
-                  backgroundRepeat: "no-repeat",
-                }}
-              >
-                <strong className="bg-zinc-500 hover:opacity-80 transition-all text-white p-1 text-sm rounded flex items-center">
-                  Buy
-                  <ShoppingCart color="#fff" size={16} className="ml-2" />
-                </strong>
-              </div>
-              <div className="p-1 flex flex-col">
-                <strong className="text-base">Nike Court Purple</strong>
-                <span className="text-sm text-zinc-500">Sneakers</span>
-                <span>U$ 1400,00</span>
-              </div>
-            </div>
-          </div>
-        </div>
+          </>
+        ) : null}
+
         <Footer />
       </div>
     </HeaderTemplate>

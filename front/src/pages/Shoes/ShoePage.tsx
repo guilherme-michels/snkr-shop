@@ -1,7 +1,11 @@
 import { HeaderTemplate } from "../../templates/HeaderTemplate";
 import dunklowcourtpurple2 from "../../assets/dunklowcourtpurple2.jpg";
 import { useParams } from "react-router-dom";
-import { getProduct, getProductSizes } from "../../api/product/product.service";
+import {
+  getImage,
+  getProduct,
+  getProductSizes,
+} from "../../api/product/product.service";
 import { useEffect, useState } from "react";
 import { Product } from "../../interfaces/ProductInterface";
 import { addProductPersonCart } from "../../api/person/person.service";
@@ -13,27 +17,45 @@ export function ShoePage() {
   const [product, setProduct] = useState<Product>();
   const [portionValue, setPortionValue] = useState(0);
   const [availableSizes, setAvailableSizes] = useState<number[]>([]);
-  const [selectedSize, setSelectedSize] = useState(availableSizes[0]);
+  const [selectedSize, setSelectedSize] = useState<number>();
+  const [image, setImage] = useState<string>();
 
   const fecthProduct = async () => {
     const product = await getProduct(params.id as any);
     setProduct(product);
     setPortionValue(parseFloat((product.price / 9).toFixed(2)));
-    getProductSizes(product!.id).then((data) => {
-      setAvailableSizes(
-        data.sizes
-          .filter((size: any) => size.quantity > 0)
-          .map((size: any) => size.size)
-      );
-    });
+    const response = await getProductSizes(product!.id);
+    const newAvailableSizes = response.sizes
+      .filter((size: any) => size.quantity > 0)
+      .map((size: any) => size.size);
+
+    newAvailableSizes.sort((a: any, b: any) => a - b);
+
+    setAvailableSizes(newAvailableSizes);
   };
 
   useEffect(() => {
     fecthProduct();
   }, []);
 
+  useEffect(() => {
+    const fetchImage = async () => {
+      if (product) {
+        const imageData = await getImage(product.image);
+        const imageUrl = URL.createObjectURL(imageData);
+        setImage(imageUrl);
+      }
+    };
+
+    fetchImage();
+  }, [product?.image]);
+
   const onAddProductPersonCart = async (productId: string) => {
     try {
+      if (!selectedSize) {
+        return;
+      }
+
       await addProductPersonCart(productId, selectedSize);
       toast({
         position: "top-right",
@@ -62,7 +84,7 @@ export function ShoePage() {
             <div className="flex items-center h-full w-full flex-col justify-center">
               <div className="flex items-center justify-center w-4/5">
                 <img
-                  src={dunklowcourtpurple2}
+                  src={image}
                   className="shadow-md shadow-zinc-500 rounded h-[440px]"
                 />
 
@@ -72,16 +94,14 @@ export function ShoePage() {
                     <span className="text-zinc-600">{product?.type}</span>
 
                     <span className="text-base mt-2 text-justify">
-                      It's that fresh cut feeling - that top-notch freshness.
-                      Jayson knows best and says it best: "When I get a cut, I
-                      think I'm in the top 5."
+                      {product.description}
                     </span>
                   </div>
 
                   <strong className="text-3xl">U$ {product?.price}</strong>
-                  <span className="text-zinc-600 text-lg">
+                  <span className="text-zinc-600 text-base">
                     Or 9 times of
-                    <span className="text-green font-bold">
+                    <span className="text-green font-bold text-lg">
                       {" "}
                       U$ {portionValue}
                     </span>{" "}
@@ -91,7 +111,7 @@ export function ShoePage() {
                   {availableSizes.length > 0 ? (
                     <div className="mt-4 w-full">
                       <Select
-                        placeholder="Select option"
+                        placeholder="Select size"
                         value={selectedSize}
                         onChange={(event) =>
                           setSelectedSize(Number(event.target.value))
@@ -108,13 +128,14 @@ export function ShoePage() {
 
                   {availableSizes.length > 0 ? (
                     <button
-                      className="mt-4 w-full bg-green text-white rounded-xl p-4 opacity-90 hover:opacity-100 transition-all text-xl font-bold"
+                      className="mt-4 w-full bg-green text-white rounded-xl p-4 opacity-90 hover:opacity-100 transition-all text-xl font-bold disabled:cursor-not-allowed disabled:opacity-50"
                       onClick={() => onAddProductPersonCart(product.id)}
+                      disabled={!selectedSize}
                     >
                       Add to cart
                     </button>
                   ) : (
-                    <button className="cursor-not-allowed mt-4 w-full bg-green text-white rounded-xl p-4 hover:opacity-100 transition-all text-xl font-bold opacity-60">
+                    <button className="cursor-not-allowed mt-4 w-full bg-green text-white rounded-xl p-4 hover:opacity-100 transition-all text-xl font-bold opacity-50">
                       Produto indisponível
                     </button>
                   )}

@@ -7,14 +7,18 @@ import {
   ModalBody,
   useToast,
 } from "@chakra-ui/react";
-import { NotePencil, Trash } from "phosphor-react";
+import { NotePencil, Star, Trash } from "phosphor-react";
 import { useCallback, useEffect, useState } from "react";
 import { SizeCard } from "./SizeCard";
 import { Product } from "../../../interfaces/ProductInterface";
 import {
   addSizes,
+  getImage,
+  getProduct,
   getProductSizes,
   removeSizes,
+  setBestSeller,
+  unSetBestSeller,
 } from "../../../api/product/product.service";
 import { isAxiosError } from "axios";
 
@@ -73,8 +77,22 @@ const sizes = [
 ];
 
 export const ModalItem = ({ onCloseModal, product }: ModalProps) => {
+  const [image, setImage] = useState<string>();
   const toast = useToast();
   const [availableSizes, setAvailableSizes] = useState<number[]>([]);
+  const [attProduct, setAttProduct] = useState<Product>(product);
+
+  useEffect(() => {
+    const fetchImage = async () => {
+      if (product) {
+        const imageData = await getImage(product.image);
+        const imageUrl = URL.createObjectURL(imageData);
+        setImage(imageUrl);
+      }
+    };
+
+    fetchImage();
+  }, [product?.image]);
 
   const onAddSize = async (productId: string, size: number) => {
     try {
@@ -84,7 +102,7 @@ export const ModalItem = ({ onCloseModal, product }: ModalProps) => {
         position: "top-right",
         description: `Size ${size} added to stock`,
         status: "success",
-        duration: 4000,
+        duration: 1000,
         isClosable: true,
       });
     } catch (error) {
@@ -103,7 +121,7 @@ export const ModalItem = ({ onCloseModal, product }: ModalProps) => {
           position: "top-right",
           description: errorDescription,
           status: "error",
-          duration: 4000,
+          duration: 1000,
           isClosable: true,
         });
       }
@@ -118,7 +136,7 @@ export const ModalItem = ({ onCloseModal, product }: ModalProps) => {
         position: "top-right",
         description: `Size ${size} removed from stock`,
         status: "success",
-        duration: 4000,
+        duration: 1000,
         isClosable: true,
       });
     } catch (error) {
@@ -133,7 +151,7 @@ export const ModalItem = ({ onCloseModal, product }: ModalProps) => {
           position: "top-right",
           description: errorDescription,
           status: "error",
-          duration: 4000,
+          duration: 1000,
           isClosable: true,
         });
       }
@@ -154,6 +172,48 @@ export const ModalItem = ({ onCloseModal, product }: ModalProps) => {
     fetchProductSizes();
   }, [fetchProductSizes]);
 
+  const onSetBestSeller = async (productId: string) => {
+    try {
+      await setBestSeller(productId);
+      fetchBestSeller();
+      toast({
+        position: "top-right",
+        description: `${product.name} added to Best Sellers!`,
+        status: "success",
+        duration: 1000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const onUnsetBestSeller = async (productId: string) => {
+    try {
+      await unSetBestSeller(productId);
+      fetchBestSeller();
+      toast({
+        position: "top-right",
+        description: `${product.name} removed from Best Sellers!`,
+        status: "success",
+        duration: 1000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchBestSeller = useCallback(() => {
+    getProduct(product.id).then((data) => {
+      setAttProduct(data);
+    });
+  }, [product]);
+
+  useEffect(() => {
+    fetchProductSizes();
+  }, [fetchProductSizes]);
+
   return (
     <Modal
       closeOnOverlayClick={true}
@@ -166,26 +226,42 @@ export const ModalItem = ({ onCloseModal, product }: ModalProps) => {
       <form>
         <ModalContent className="h-2/3">
           <ModalHeader className="bg-zinc-300 text-zinc-700">
-            <strong className="text-2xl">{product.name}</strong>
+            <strong className="text-2xl">{attProduct.name}</strong>
           </ModalHeader>
           <ModalCloseButton color={"#aeaeae"} />
 
           <ModalBody className="bg-zinc-200 h-full">
             <div className="flex items-center h-full p-8">
               <div className="h-full w-3/5">
-                <div className="bg-white h-full w-full rounded-xl"></div>
+                <div
+                  className="h-full flex items-end p-4 bg-[#f8f8f8] shadow-md shadow-zinc-200 transition-all"
+                  style={{
+                    backgroundImage: `url(${image})`,
+                    backgroundSize: "contain",
+                    backgroundRepeat: "no-repeat",
+                  }}
+                />
               </div>
               <div className="h-full w-2/5 flex flex-col text-zinc-700 items-center">
                 <div className="flex items-center justify-between w-full">
                   <div className="flex flex-col items-center ml-10">
-                    <strong className="text-base">{product.name}</strong>
-                    <strong className="text-3xl mt-1">{product.type}</strong>
+                    <strong className="text-base">{attProduct.name}</strong>
+                    <strong className="text-3xl mt-1">{attProduct.type}</strong>
                   </div>
                   <div>
-                    <NotePencil
-                      className="bg-zinc-700 p-2 text-white cursor-pointer rounded-full hover:bg-zinc-900 transition-all"
-                      size={48}
-                    />
+                    {attProduct.bestSeller ? (
+                      <Star
+                        className="bg-yellow p-2 text-white cursor-pointer rounded-full hover:opacity-60 transition-all"
+                        size={48}
+                        onClick={() => onUnsetBestSeller(attProduct.id)}
+                      />
+                    ) : (
+                      <Star
+                        className="bg-black p-2 text-white cursor-pointer rounded-full hover:bg-zinc-900 transition-all"
+                        size={48}
+                        onClick={() => onSetBestSeller(attProduct.id)}
+                      />
+                    )}
                   </div>
                 </div>
 
@@ -193,7 +269,7 @@ export const ModalItem = ({ onCloseModal, product }: ModalProps) => {
                   {sizes.map((size) => (
                     <div key={size.size}>
                       <div
-                        onClick={() => onAddSize(product.id, size.size)}
+                        onClick={() => onAddSize(attProduct.id, size.size)}
                         className="flex flex-col items-center"
                       >
                         <SizeCard
@@ -203,7 +279,7 @@ export const ModalItem = ({ onCloseModal, product }: ModalProps) => {
                       </div>
                       {availableSizes.includes(size.size) ? (
                         <Trash
-                          onClick={() => onDeleteSize(product.id, size.size)}
+                          onClick={() => onDeleteSize(attProduct.id, size.size)}
                           className="mt-2 cursor-pointer hover:opacity-75"
                           size={16}
                         />

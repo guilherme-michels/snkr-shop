@@ -10,9 +10,8 @@ CREATE TABLE "Product" (
     "type" TEXT NOT NULL,
     "image" TEXT NOT NULL,
     "cartId" TEXT,
-    "bestSellerId" INTEGER,
-    CONSTRAINT "Product_cartId_fkey" FOREIGN KEY ("cartId") REFERENCES "Cart" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
-    CONSTRAINT "Product_bestSellerId_fkey" FOREIGN KEY ("bestSellerId") REFERENCES "BestSeller" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+    "bestSeller" BOOLEAN NOT NULL,
+    CONSTRAINT "Product_cartId_fkey" FOREIGN KEY ("cartId") REFERENCES "Cart" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 -- CreateTable
@@ -68,11 +67,6 @@ CREATE TABLE "Sales" (
     "data" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "productId" TEXT NOT NULL,
     CONSTRAINT "Sales_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
-);
-
--- CreateTable
-CREATE TABLE "BestSeller" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
 );
 
 -- CreateIndex

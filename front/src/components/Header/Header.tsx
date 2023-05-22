@@ -107,9 +107,9 @@ export function Header() {
               <DrawerBody className="bg-zinc-200">
                 <UserCart />
               </DrawerBody>
-              <DrawerFooter className="flex items-center bg-zinc-100">
+              <DrawerFooter className="flex items-center bg-zinc-100 w-full">
                 <Link to={"/"}>
-                  <button className="bg-zinc-900 hover:opacity-[90%] transition-all w-full p-1 text-white">
+                  <button className="bg-zinc-900 hover:opacity-[90%] transition-all w-[270px] p-1 text-white">
                     End purchase
                   </button>
                 </Link>

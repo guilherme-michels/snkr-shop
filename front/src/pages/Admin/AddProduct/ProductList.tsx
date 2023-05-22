@@ -88,7 +88,9 @@ export const ProductList: React.FunctionComponent<ProductTableProps> = (
         <Thead>
           <Tr>
             <Th>Name</Th>
+            <Th>Price</Th>
             <Th>Type</Th>
+            <Th>Code</Th>
           </Tr>
         </Thead>
         <Tbody>
@@ -104,6 +106,8 @@ export const ProductList: React.FunctionComponent<ProductTableProps> = (
                   {product.name}
                 </Td>
                 <Td>{product.type}</Td>
+                <Td>{product.code}</Td>
+                <Td>{product.price}</Td>
                 <Td>
                   <div
                     style={{

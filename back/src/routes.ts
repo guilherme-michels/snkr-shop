@@ -2,6 +2,7 @@ import { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { prisma } from "./lib/prisma";
 import jwt from "jsonwebtoken";
+import fsPromises from "fs/promises";
 import fs from "fs";
 import { validateJwt } from "./middlewares/auth";
 import mime from "mime-types";
@@ -9,6 +10,7 @@ import { v4 as uuid } from "uuid";
 import util from "util";
 import { pipeline } from "stream";
 const pump = util.promisify(pipeline);
+import path from "path";
 
 interface LoginData {
   email: string;
@@ -55,13 +57,11 @@ export async function appRoutes(app: FastifyInstance) {
 
       const body = {
         name: data.fields.name.value,
-        type: data.fields.name.value,
-        price: data.fields.name.value,
-        code: data.fields.name.value,
-        description: data.fields.name.value,
+        type: data.fields.type.value,
+        price: data.fields.price.value,
+        code: data.fields.code.value,
+        description: data.fields.description.value,
       };
-
-      console.log(`data mime type`, data.mimetype);
 
       const filename = uuid() + `.` + mime.extension(data.mimetype);
       await pump(data.file, fs.createWriteStream(`./images/${filename}`));
@@ -102,6 +102,7 @@ export async function appRoutes(app: FastifyInstance) {
             price,
             description,
             image: filename,
+            bestSeller: false,
           },
         });
 
@@ -113,6 +114,58 @@ export async function appRoutes(app: FastifyInstance) {
       }
     }
   );
+
+  app.get("/products/best-sellers", async (req, res) => {
+    try {
+      const products = await prisma.product.findMany({
+        where: {
+          bestSeller: true,
+        },
+      });
+
+      res.send(products);
+    } catch (error) {
+      res.status(500).send({ error: "Error retrieving best-selling products" });
+    }
+  });
+
+  app.put("/products/:id/set-best-seller", async (req: any, res) => {
+    const { id } = req.params;
+
+    try {
+      const updatedProduct = await prisma.product.update({
+        where: {
+          id: id,
+        },
+        data: {
+          bestSeller: true,
+        },
+      });
+
+      res.send(updatedProduct);
+    } catch (error) {
+      res.status(500).send({ error: "Error updating product" });
+    }
+  });
+
+  app.put("/products/:id/unset-best-seller", async (req: any, res) => {
+    const { id } = req.params;
+
+    try {
+      const updatedProduct = await prisma.product.update({
+        where: {
+          id: id,
+        },
+        data: {
+          bestSeller: false,
+        },
+      });
+
+      res.send(updatedProduct);
+    } catch (error) {
+      res.status(500).send({ error: "Error updating product" });
+    }
+  });
 
   app.get("/shoe-sizes/:productId", async (request: any, response) => {
     const { productId } = request.params;
@@ -160,8 +213,6 @@ export async function appRoutes(app: FastifyInstance) {
             size: Number(size),
           },
         });
-
-        console.log(existingShoeSize, "DSAHDHUASHUASDHUASDHU");
 
         if (!existingShoeSize) {
           return response.status(404).send({ error: "Shoe size not found" });
@@ -258,11 +309,15 @@ export async function appRoutes(app: FastifyInstance) {
     }
   );
 
-  app.get(`/file`, async (request, reply) => {
-    const file = fs.readFileSync(`./images/${(request.query as any).image}`);
-    reply.type("image/jpeg");
-    return (reply as any).sendFile((request.query as any).image);
-  });
+  app.get(
+    "/file/:image",
+    { preHandler: [validateJwt] },
+    async (req: any, res) => {
+      const { image } = req.params;
+      const file = await fsPromises.readFile(path.join("images", image));
+      return res.type("image/jpeg").send(file);
+    }
+  );
 
   // app.put(
   //   "/product/:id/edit",
@@ -337,6 +392,29 @@ export async function appRoutes(app: FastifyInstance) {
       response.status(500).send("Error getting sales");
     }
   });
+
+  app.put(
+    "/product/:id/edit-bestseller",
+    { preHandler: [validateJwt] },
+    async (req: any, res) => {
+      const { id } = req.params;
+
+      try {
+        const updatedProduct = await prisma.product.update({
+          where: {
+            id: id,
+          },
+          data: {
+            bestSeller: true,
+          },
+        });
+
+        res.send(updatedProduct);
+      } catch (error) {
+        res.status(500).send({ error: "Error updating product" });
+      }
+    }
+  );
 
   app.post(
     "/person/store",
@@ -442,8 +520,6 @@ export async function appRoutes(app: FastifyInstance) {
       password,
       position,
     } = req.body;
-
-    console.log("req", req.body);
 
     try {
       const updatedPerson = await prisma.user.update({

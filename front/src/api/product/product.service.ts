@@ -6,9 +6,9 @@ export async function addProduct(payload: AddProductPayload, imageFile: File) {
   formData.append("name", payload.name);
   formData.append("type", payload.type);
   formData.append("code", payload.code);
+  formData.append("description", payload.description);
   formData.append("price", String(payload.price));
   formData.append("imageFile", imageFile);
-  console.log("formdata", Array.from(formData.entries()));
   return api
     .post("/products/store", formData, {
       headers: {
@@ -46,4 +46,28 @@ export function removeSizes(productId: string, size: number) {
 
 export function getProductSizes(productId: string) {
   return api.get(`/shoe-sizes/${productId}`).then((res) => res.data);
+}
+
+export function getBestSeller() {
+  return api.get(`/products/best-sellers`).then((res) => res.data);
+}
+
+export function setBestSeller(productId: string) {
+  return api
+    .put(`/products/${productId}/set-best-seller`)
+    .then((res) => res.data);
+}
+
+export function unSetBestSeller(productId: string) {
+  return api
+    .put(`/products/${productId}/unset-best-seller`)
+    .then((res) => res.data);
+}
+
+export function getImage(image: string): Promise<Blob> {
+  return api
+    .get(`/file/${image}`, {
+      responseType: "blob",
+    })
+    .then((res) => res.data);
 }
