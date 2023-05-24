@@ -6,4 +6,5 @@ export interface CartItem {
   cartId: string;
   product: Product;
   id: string;
+  size: number;
 }

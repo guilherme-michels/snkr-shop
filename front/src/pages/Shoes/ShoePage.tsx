@@ -98,12 +98,20 @@ export function ShoePage() {
                     </span>
                   </div>
 
-                  <strong className="text-3xl">U$ {product?.price}</strong>
+                  <strong className="text-3xl">
+                    U${" "}
+                    {Number(product.price).toLocaleString("pt-BR", {
+                      minimumFractionDigits: 2,
+                    })}
+                  </strong>
                   <span className="text-zinc-600 text-base">
                     Or 9 times of
-                    <span className="text-green font-bold text-lg">
+                    <span className="text-green font-bold text-base">
                       {" "}
-                      U$ {portionValue}
+                      U${" "}
+                      {portionValue.toLocaleString("pt-BR", {
+                        minimumFractionDigits: 2,
+                      })}
                     </span>{" "}
                     on the interest-free card
                   </span>

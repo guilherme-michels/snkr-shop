@@ -20,6 +20,8 @@ type AddProductData = z.infer<typeof addProductSchema>;
 export function AddProduct() {
   const toast = useToast();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [image, setImage] = useState<File | null>(null);
 
   const { handleSubmit, register, reset, setValue } = useForm<AddProductData>({
     defaultValues: {
@@ -38,10 +40,6 @@ export function AddProduct() {
       setSelectedFile(event.target.files[0]);
     }
   };
-
-  const [isModalVisible, setIsModalVisible] = useState(false);
-
-  const [image, setImage] = useState<File | null>(null);
 
   const onFormSubmit = async (data: AddProductData) => {
     try {

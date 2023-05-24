@@ -45,6 +45,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   Cart      Cart[]
+  Sales     Sales[]
 }
 
 model ShoeSize {
@@ -83,4 +84,7 @@ model Sales {
   data      DateTime @default(now())
   productId String
   product   Product  @relation(fields: [productId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  size      Int
 }

@@ -1,10 +1,6 @@
 import {
   Drawer,
-  DrawerBody,
   DrawerContent,
-  DrawerHeader,
-  DrawerOverlay,
-  DrawerFooter,
   useDisclosure,
   Menu,
   MenuButton,
@@ -89,32 +85,7 @@ export function Header() {
           </Link>
 
           <Drawer placement={"right"} onClose={onClose} isOpen={isOpen}>
-            <DrawerOverlay />
-            <DrawerContent>
-              <DrawerHeader
-                borderBottomWidth="1px"
-                fontSize={16}
-                fontWeight={"normal"}
-                className="flex items-center justify-between bg-zinc-100 text-zinc-900"
-              >
-                My cart
-                <X
-                  size={22}
-                  onClick={onClose}
-                  className="cursor-pointer hover:animate-pulse"
-                />
-              </DrawerHeader>
-              <DrawerBody className="bg-zinc-200">
-                <UserCart />
-              </DrawerBody>
-              <DrawerFooter className="flex items-center bg-zinc-100 w-full">
-                <Link to={"/"}>
-                  <button className="bg-zinc-900 hover:opacity-[90%] transition-all w-[270px] p-1 text-white">
-                    End purchase
-                  </button>
-                </Link>
-              </DrawerFooter>
-            </DrawerContent>
+            <UserCart onCloseCart={onClose} />
           </Drawer>
         </div>
       </div>

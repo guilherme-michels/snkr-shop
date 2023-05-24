@@ -7,6 +7,7 @@ import { ShoesPage } from "../pages/Shoes/ShoesPage";
 import { useAuth } from "../context/AuthContext";
 import { AdminEdit } from "../pages/Admin/AddAdmin/AdminEdit";
 import { NikeInvenciblePage } from "../pages/Shoes/NikeInvencible";
+import { ProductEdit } from "../pages/Admin/AddProduct/ProductEdit";
 
 export function AppRoutes() {
   return (
@@ -19,6 +20,7 @@ export function AppRoutes() {
 
       <Route path="/shoes" element={<ShoesPage />} />
       <Route path="/shoes/:id/see" element={<ShoePage />} />
+      <Route path="/product/:id/update" element={<ProductEdit />} />
 
       <Route path="/shoes/nike-invencible" element={<NikeInvenciblePage />} />
     </ReactRoutes>

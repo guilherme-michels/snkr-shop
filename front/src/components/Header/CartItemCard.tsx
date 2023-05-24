@@ -8,6 +8,7 @@ import { useToast } from "@chakra-ui/react";
 
 interface CartItemProps {
   product: Product;
+  size: number;
 }
 
 export function CartItemCard(props: CartItemProps) {
@@ -24,29 +25,8 @@ export function CartItemCard(props: CartItemProps) {
     fetchImage();
   }, [props.product.image]);
 
-  // const onDeleteProductPersonCart = async (productId: string) => {
-  //   try {
-  //     await deleteProductPersonCart(productId);
-  //     toast({
-  //       position: "top-right",
-  //       description: "Product removed from cart!",
-  //       status: "success",
-  //       duration: 1000,
-  //       isClosable: true,
-  //     });
-  //   } catch (err) {
-  //     toast({
-  //       position: "top-right",
-  //       description: "Error",
-  //       status: "error",
-  //       duration: 1000,
-  //       isClosable: true,
-  //     });
-  //   }
-  // };
-
   return (
-    <div className="bg-zinc-50 h-auto mt-3 p-2 rounded-xl">
+    <div className="bg-zinc-50 h-auto p-2 rounded-r-lg rounded-b-lg">
       <div
         className="h-[250px] flex items-end p-4 border-black"
         style={{
@@ -59,10 +39,16 @@ export function CartItemCard(props: CartItemProps) {
       <div className="flex flex-col">
         <div className="flex justify-between text-zinc-800">
           <div className="flex flex-col">
-            <strong className="text-base"> {props.product.name}</strong>
+            <span className="text-base font-medium"> {props.product.name}</span>
+            <span className="text-sm">Size {props.size}</span>
             <span className="text-sm"> {props.product.type}</span>
           </div>
-          <strong>U$ {props.product.price}</strong>
+          <strong className="text-base font-bold">
+            U${" "}
+            {Number(props.product.price).toLocaleString("pt-BR", {
+              minimumFractionDigits: 2,
+            })}
+          </strong>
         </div>
       </div>
     </div>

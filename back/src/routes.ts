@@ -11,6 +11,7 @@ import util from "util";
 import { pipeline } from "stream";
 const pump = util.promisify(pipeline);
 import path from "path";
+import { CartItem } from "@prisma/client";
 
 interface LoginData {
   email: string;
@@ -589,6 +590,172 @@ export async function appRoutes(app: FastifyInstance) {
       }
     }
   );
+
+  app.delete(
+    "/person/cart/:productId/delete/:size",
+    { preHandler: [validateJwt] },
+    async (req: any, res) => {
+      const productId = req.params.productId;
+      const size = req.params.size;
+      const userId = req.user.id;
+
+      try {
+        const userCart = await prisma.cart.findFirst({
+          where: {
+            userId,
+          },
+        });
+
+        if (!userCart) {
+          return res.status(409).send({ error: "User cart not found" });
+        }
+
+        const productItem = await prisma.cartItem.findFirst({
+          where: {
+            cartId: userCart.id,
+            productId: productId,
+            size: Number(size),
+          },
+        });
+
+        if (!productItem) {
+          return res.status(404).send({ error: "Item not found in cart" });
+        }
+
+        const deleteCartItem = await prisma.cartItem.delete({
+          where: {
+            id: productItem.id,
+          },
+        });
+
+        return res.send(deleteCartItem);
+      } catch (error) {
+        console.log(error);
+        return res.status(500).send({ error: "Error deleting item" });
+      }
+    }
+  );
+
+  app.post(
+    "/person/finish-buy",
+    { preHandler: [validateJwt] },
+    async (req: any, res: any) => {
+      const userId: string = req.user.id;
+      const cartItems = req.body.products;
+      console.log(cartItems);
+
+      try {
+        const salesPromises = cartItems.map(async (cartItem: CartItem) => {
+          const { productId }: { productId: string } = cartItem;
+
+          const itemCart = await prisma.cartItem.findFirst({
+            where: {
+              productId,
+            },
+            include: {
+              cart: {
+                include: {
+                  user: true,
+                },
+              },
+            },
+          });
+
+          if (!itemCart || !itemCart.cart || itemCart.cart.userId !== userId) {
+            return res.status(404).send({ error: "Item not found in cart" });
+          }
+
+          const product = await prisma.product.findUnique({
+            where: {
+              id: productId,
+            },
+          });
+
+          if (!product) {
+            return res.status(404).send({ error: "Product not found" });
+          }
+
+          const size: any = itemCart.size;
+          const valor: any = Number(product.price);
+
+          const newSale = await prisma.sales.create({
+            data: {
+              valor,
+              productId: productId,
+              userId: userId,
+              size,
+            },
+          });
+
+          await prisma.cartItem.delete({
+            where: {
+              id: itemCart.id,
+            },
+          });
+
+          return newSale;
+        });
+
+        const sales = await Promise.all(salesPromises);
+
+        return res.send({ sales });
+      } catch (error) {
+        return res.status(500).send({ error: "Error finishing the purchase" });
+      }
+    }
+  );
+
+  app.get("/sales/week-sales", async (req, res) => {
+    try {
+      const currentDate = new Date();
+
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(currentDate.getDate() - 7);
+
+      const recentSales = await prisma.sales.findMany({
+        where: {
+          data: {
+            gte: sevenDaysAgo,
+            lte: currentDate,
+          },
+        },
+        include: {
+          product: true,
+          user: true,
+        },
+      });
+
+      return res.send({ sales: recentSales });
+    } catch (error) {
+      return res.status(500).send({ error: "Error retrieving recent sales" });
+    }
+  });
+
+  app.get("/sales/month-sales", async (req, res) => {
+    try {
+      const currentDate = new Date();
+
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(currentDate.getDate() - 30);
+
+      const recentSales = await prisma.sales.findMany({
+        where: {
+          data: {
+            gte: sevenDaysAgo,
+            lte: currentDate,
+          },
+        },
+        include: {
+          product: true,
+          user: true,
+        },
+      });
+
+      return res.send({ sales: recentSales });
+    } catch (error) {
+      return res.status(500).send({ error: "Error retrieving recent sales" });
+    }
+  });
 
   app.post(
     "/person/cart/:id/store",

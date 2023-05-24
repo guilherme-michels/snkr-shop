@@ -41,11 +41,8 @@ export function LandingPage() {
 
   const fetchBestSellers = async () => {
     const bestSellers = await getBestSeller();
-
     const shuffledBestSellers = bestSellers.sort(() => Math.random() - 0.5);
-
-    const randomBestSellers = shuffledBestSellers.slice(0, 5);
-
+    const randomBestSellers = shuffledBestSellers.slice(0, 6);
     setBestSellers(randomBestSellers);
   };
 

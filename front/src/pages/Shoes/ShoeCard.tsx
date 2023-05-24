@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Product } from "../../interfaces/ProductInterface";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { getImage } from "../../api/product/product.service";
 import { ShoppingCart } from "phosphor-react";
 
@@ -40,7 +40,12 @@ export function ShoeCard(props: ShoeCardProps) {
         <div className="p-1 flex flex-col">
           <strong className="text-base">{props.product.name}</strong>
           <span className="text-sm text-zinc-500">{props.product.type}</span>
-          <span>U$ {props.product.price}</span>
+          <span>
+            U${" "}
+            {Number(props.product.price).toLocaleString("pt-BR", {
+              minimumFractionDigits: 2,
+            })}
+          </span>
         </div>
       </Link>
     </div>

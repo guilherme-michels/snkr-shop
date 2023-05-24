@@ -10,13 +10,22 @@ import {
   MenuList,
   MenuItem,
   Button,
+  Checkbox,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
-import { DotsThree, MagnifyingGlass, Pencil, Trash } from "phosphor-react";
+import {
+  DotsThree,
+  FilePdf,
+  MagnifyingGlass,
+  Pencil,
+  Trash,
+} from "phosphor-react";
 import clsx from "clsx";
 import { ModalDelete } from "../../../components/Modal/ModalDelete";
 import { Product } from "../../../interfaces/ProductInterface";
 import { ModalItem } from "../StockControl/ModalItem";
+import { PDFViewer } from "@react-pdf/renderer";
+import { ProductsPdf } from "./ProductsPdf";
 
 interface ProductTableProps {
   products: Array<Product>;
@@ -29,16 +38,48 @@ export const ProductList: React.FunctionComponent<ProductTableProps> = (
 ) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isModalSizesVisible, setisModalSizesVisible] = useState(false);
+  const [isModalEditVisible, setIsModalEditVisible] = useState(false);
   const [productSelected, setProductSelected] = useState<Product | null>(null);
-  const [filter, setFilter] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isPdfOpen, setIsPdfOpen] = useState(false);
+  const [nameFilter, setNameFilter] = useState(false);
+  const [priceFilter, setPriceFilter] = useState(false);
+  const [typeFilter, setTypeFilter] = useState(false);
+  const [filter, setFilter] = useState("");
 
-  const productFilter =
-    props.products && Array.isArray(props.products)
-      ? props.products.filter((product) =>
-          product.name.toLowerCase().includes(filter.toLowerCase())
-        )
-      : [];
+  const productFilter = props.products.filter((product) => {
+    const filterLower = filter.toLowerCase();
+
+    if (!nameFilter && !priceFilter && !typeFilter) {
+      return true;
+    }
+
+    if (nameFilter && product.name.toLowerCase().includes(filterLower)) {
+      return true;
+    }
+
+    if (priceFilter && product.price.toString().includes(filterLower)) {
+      return true;
+    }
+
+    if (typeFilter && product.type.toLowerCase().includes(filterLower)) {
+      return true;
+    }
+
+    return false;
+  });
+
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = event.target;
+
+    if (name === "name") {
+      setNameFilter(checked);
+    } else if (name === "price") {
+      setPriceFilter(checked);
+    } else if (name === "type") {
+      setTypeFilter(checked);
+    }
+  };
 
   return (
     <>
@@ -50,34 +91,86 @@ export const ProductList: React.FunctionComponent<ProductTableProps> = (
           alignItems: "center",
         }}
       >
-        <div className="flex items-center rounded mb-2 w-full">
-          <MagnifyingGlass
-            onClick={() => setIsSearchOpen(!isSearchOpen)}
-            color="#696969"
-            className={clsx(
-              "h-10 w-10 p-1 cursor-pointer hover:opacity-80 transition-all border-solid border-[1px] border-zinc-700",
-              {
-                "rounded-l-sm": isSearchOpen === true,
-                "rounded-sm": isSearchOpen === false,
-              }
-            )}
-          />
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center rounded mb-2 w-full ">
+            <MagnifyingGlass
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              color="#696969"
+              className={clsx(
+                "h-10 w-10 p-1 cursor-pointer hover:opacity-80 transition-all border-solid border-[1px] border-zinc-700",
+                {
+                  "rounded-l-sm": isSearchOpen === true,
+                  "rounded-sm": isSearchOpen === false,
+                }
+              )}
+            />
 
-          <input
-            className={clsx(
-              "bg-transparent transition-all h-10 outline-none rounded-r-sm border-solid",
-              {
-                "w-[29%] border-[1px] border-l-0 placeholder p-2 border-zinc-700":
-                  isSearchOpen === true,
-                "w-0 border-l-0 border-r-0": isSearchOpen === false,
+            <input
+              className={clsx(
+                "bg-transparent transition-all h-10 outline-none rounded-r-sm border-solid",
+                {
+                  "w-[29%] border-[1px] border-l-0 placeholder p-2 border-zinc-700":
+                    isSearchOpen === true,
+                  "w-0 border-l-0 border-r-0": isSearchOpen === false,
+                }
+              )}
+              placeholder="Search"
+              onChange={(ev) => setFilter(ev.target.value)}
+              value={filter}
+            />
+          </div>
+
+          <div className=" flex items-center">
+            <label className="mr-8 flex font-semibold text-zinc-500">
+              Name
+              <Checkbox
+                className="ml-2"
+                name="name"
+                checked={nameFilter}
+                onChange={handleCheckboxChange}
+                size={"lg"}
+              />
+            </label>
+            <label className="mr-8 flex font-semibold text-zinc-500">
+              Price
+              <Checkbox
+                className="ml-2"
+                name="price"
+                checked={priceFilter}
+                onChange={handleCheckboxChange}
+                size={"lg"}
+              />
+            </label>
+
+            <label className="mr-8 flex font-semibold text-zinc-500">
+              Type
+              <Checkbox
+                className="ml-2"
+                name="type"
+                checked={typeFilter}
+                onChange={handleCheckboxChange}
+                size={"lg"}
+              />
+            </label>
+
+            <FilePdf
+              onClick={() => setIsPdfOpen(!isPdfOpen)}
+              color="#696969"
+              className={
+                "h-10 w-10 p-1 cursor-pointer hover:opacity-80 transition-all border-solid border-[1px] border-zinc-700"
               }
-            )}
-            placeholder="Search"
-            onChange={(ev) => setFilter(ev.target.value)}
-            value={filter}
-          />
+            />
+          </div>
         </div>
       </div>
+
+      {isPdfOpen ? (
+        <PDFViewer width="100%" height="100%" className="mb-4 h-screen">
+          <ProductsPdf products={productFilter} />
+        </PDFViewer>
+      ) : null}
+
+      <hr className="mt-2 mb-2 border-black" />
 
       <Table
         variant="striped"
@@ -102,12 +195,18 @@ export const ProductList: React.FunctionComponent<ProductTableProps> = (
                     setProductSelected(product);
                     setisModalSizesVisible(true);
                   }}
+                  className="w-[20%]"
                 >
                   {product.name}
                 </Td>
-                <Td>{product.type}</Td>
-                <Td>{product.code}</Td>
-                <Td>{product.price}</Td>
+                <Td className="w-[20%]">
+                  U${" "}
+                  {Number(product.price).toLocaleString("pt-BR", {
+                    minimumFractionDigits: 2,
+                  })}
+                </Td>
+                <Td className="w-[20%]">{product.type}</Td>
+                <Td className="w-[20%]">{product.code}</Td>
                 <Td>
                   <div
                     style={{

@@ -1,4 +1,5 @@
 import { api } from "..";
+import { CartItem } from "../../interfaces/CartItem";
 import { AddProductPayload, Product } from "../../interfaces/ProductInterface";
 
 export async function addProduct(payload: AddProductPayload, imageFile: File) {
@@ -70,4 +71,16 @@ export function getImage(image: string): Promise<Blob> {
       responseType: "blob",
     })
     .then((res) => res.data);
+}
+
+export function addSales(products: CartItem[]) {
+  return api.post("/person/finish-buy", { products }).then((res) => res.data);
+}
+
+export function getWeekSales() {
+  return api.get("/sales/week-sales").then((res) => res.data);
+}
+
+export function getMonthSales() {
+  return api.get("/sales/week-sales").then((res) => res.data);
 }

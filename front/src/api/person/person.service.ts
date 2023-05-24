@@ -58,8 +58,10 @@ export function getPersonCart() {
   return api.get(`/person/cart`).then((res) => res.data);
 }
 
-export function deleteProductPersonCart(productId: string) {
-  return api.delete(`/person/cart/${productId}/delete`).then((res) => res.data);
+export function deleteProductPersonCart(productId: string, size: number) {
+  return api
+    .delete(`/person/cart/${productId}/delete/${size}`)
+    .then((res) => res.data);
 }
 
 export function addProductPersonCart(productId: string, size: number) {
