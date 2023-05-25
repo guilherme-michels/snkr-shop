@@ -4,24 +4,24 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { editPerson, getPerson } from "../../../api/person/person.service";
 import { HeaderTemplate } from "../../../templates/HeaderTemplate";
 import { useEffect, useState } from "react";
-import { getProduct } from "../../../api/product/product.service";
+import { editProduct, getProduct } from "../../../api/product/product.service";
 
 const editProductSchema = z.object({
-  firstName: z.string().min(3),
-  lastName: z.string().min(3),
-  email: z.string().email().nonempty(),
-  password: z.string().min(5),
-  position: z.string().min(3),
-  phone: z.string().min(11).max(11),
-  cpf: z.string().min(11).max(11),
-  dateBirth: z.string().nonempty(),
+  id: z.string(),
+  name: z.string().min(3),
+  type: z.string().min(3),
+  price: z.number(),
+  code: z.string().min(3),
+  description: z.string(),
+  image: z.string().optional(),
 });
 
+type EditProductData = z.infer<typeof editProductSchema>;
+
 export function ProductEdit() {
-  const { handleSubmit, register, setValue } = useForm({
+  const { handleSubmit, register, setValue } = useForm<EditProductData>({
     shouldUseNativeValidation: true,
     resolver: zodResolver(editProductSchema),
   });
@@ -29,12 +29,6 @@ export function ProductEdit() {
   const navigate = useNavigate();
   const toast = useToast();
   const params = useParams();
-  const [name, setName] = useState<any>();
-  const [code, setCode] = useState<any>();
-  const [price, setPrice] = useState<any>();
-  const [description, setDescription] = useState<any>();
-  const [type, setType] = useState<any>();
-  const [image, setImage] = useState<any>();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,12 +37,9 @@ export function ProductEdit() {
     }
   };
 
-  async function onEdit(values: any) {
+  async function onEdit(data: EditProductData) {
     try {
-      await editPerson({
-        ...values,
-        id: params.id,
-      });
+      await editProduct(data, selectedFile);
 
       toast({
         description: "Product successfully edited.",
@@ -72,24 +63,13 @@ export function ProductEdit() {
   useEffect(() => {
     getProduct(params.id as any).then((res) => {
       setValue("name", res.name);
-      setName(res.name);
-
+      setValue("id", params.id!);
       setValue("code", res.code);
-      setCode(res.code);
-
       setValue("price", res.price);
-      setPrice(res.price);
-
       setValue("description", res.description);
-      setDescription(res.description);
-
       setValue("type", res.type);
-      setType(res.type);
-
-      setValue("image", res.image);
-      setImage(res.image);
     });
-  }, [params, setValue]);
+  }, [params.id, setValue]);
 
   return (
     <HeaderTemplate>

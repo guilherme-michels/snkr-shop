@@ -10,3 +10,4 @@ export interface Product {
 }
 
 export type AddProductPayload = Omit<Product, "id" | "image">;
+export type EditProductPayload = Omit<Product, "image">;

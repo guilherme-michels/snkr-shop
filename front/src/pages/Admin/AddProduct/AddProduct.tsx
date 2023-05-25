@@ -1,5 +1,5 @@
 import { useToast } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { NormalModal } from "../../../components/Modal/NormalModal";
 import { isAxiosError } from "axios";
 import { useForm } from "react-hook-form";
@@ -21,7 +21,6 @@ export function AddProduct() {
   const toast = useToast();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [image, setImage] = useState<File | null>(null);
 
   const { handleSubmit, register, reset, setValue } = useForm<AddProductData>({
     defaultValues: {

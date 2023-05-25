@@ -47,20 +47,19 @@ export function DashboardFeedback(
     })
     .reverse();
 
+  const totalSales = weekSales.length;
+  const averageSalesPerDay = (totalSales / 7).toFixed(2);
+
   return (
     <div className="flex w-full shadow-md shadow-zinc-400 rounded">
       <div className="p-5 flex flex-col text-zinc-700 w-1/3">
-        <strong className="text-2xl">Sales per day in the week</strong>
-        <div className="flex items-center mt-4 ">
-          <CaretDoubleUp size={24} className="mr-1 text-green" />
-          More sales day
+        <strong className="text-2xl">Avarage sales per day in the week</strong>
+        <div className="flex items-center mt-4 h-full text-3xl font-semibold justify-center">
+          <div className="bg-green p-4 flex rounded-3xl text-zinc-900 items-center">
+            <CaretDoubleUp size={30} className="mr-4 text-white" />
+            {averageSalesPerDay}
+          </div>
         </div>
-        <strong className="mt-1 text-base">Saturday</strong>
-        <div className="flex items-center mt-4">
-          <CaretDoubleDown size={24} className="mr-1 text-red" />
-          Less sales day
-        </div>
-        <strong className="mt-1 text-base">Sunday</strong>
       </div>
       <div className="p-5 rounded flex flex-col text-zinc-700  w-2/3">
         <ResponsiveContainer width="100%" height={200}>

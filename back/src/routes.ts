@@ -320,35 +320,67 @@ export async function appRoutes(app: FastifyInstance) {
     }
   );
 
-  // app.put(
-  //   "/product/:id/edit",
-  //   { preHandler: [validateJwt] },
-  //   async (req: any, res) => {
-  //     const { id } = req.params;
+  app.put(
+    "/products/:productId/update",
+    { preHandler: [validateJwt] },
+    async (request: any, response) => {
+      const { productId } = request.params;
+      const data = await (request as any).file();
 
-  //     try {
-  //       const updatedProduct = await prisma.user.update({
-  //         where: {
-  //           id: req.id,
-  //         },
-  //         data: {
-  //           firstName: req.firstName,
-  //           lastName: req.lastName,
-  //           email: req.email,
-  //           password: req.password,
-  //           position: req.position,
-  //           phone: req.phone,
-  //           cpf: req.cpf,
-  //           dateBirth: req.dateBirth,
-  //         },
-  //       });
+      const body = {
+        name: data.fields.name.value,
+        type: data.fields.type.value,
+        price: data.fields.price.value,
+        code: data.fields.code.value,
+        description: data.fields.description.value,
+      };
 
-  //       res.send(updatedProduct);
-  //     } catch (error) {
-  //       res.status(500).send({ error: "Error edit product" });
-  //     }
-  //   }
-  // );
+      console.log(body, "teste");
+
+      const filename = uuid() + `.` + mime.extension(data.mimetype);
+      console.log(filename, "teste");
+      await pump(data.file, fs.createWriteStream(`./images/${filename}`));
+
+      const updateProduct = z.object({
+        name: z.string().optional(),
+        type: z.string().optional(),
+        price: z.string().optional(),
+        code: z.string().optional(),
+        description: z.string().optional(),
+      });
+
+      const { name, type, code, price, description } =
+        updateProduct.parse(body);
+
+      try {
+        const existingProduct = await prisma.product.findUnique({
+          where: { id: productId },
+        });
+
+        if (!existingProduct) {
+          return response.status(404).send({ error: "Product not found" });
+        }
+
+        const updatedProduct = await prisma.product.update({
+          where: { id: productId },
+          data: {
+            code: code || existingProduct.code,
+            name: name || existingProduct.name,
+            type: type || existingProduct.type,
+            price: price || existingProduct.price,
+            description: description || existingProduct.description,
+            image: filename || existingProduct.image,
+          },
+        });
+
+        return updatedProduct;
+      } catch (error) {
+        return response
+          .status(500)
+          .send({ error: "Error while updating product" });
+      }
+    }
+  );
 
   app.get("/products/:id/show", async (req: any, reply) => {
     const { id } = req.params;
@@ -651,6 +683,7 @@ export async function appRoutes(app: FastifyInstance) {
           const itemCart = await prisma.cartItem.findFirst({
             where: {
               productId,
+              size: cartItem.size,
             },
             include: {
               cart: {

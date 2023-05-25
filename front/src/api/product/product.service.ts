@@ -1,6 +1,10 @@
 import { api } from "..";
 import { CartItem } from "../../interfaces/CartItem";
-import { AddProductPayload, Product } from "../../interfaces/ProductInterface";
+import {
+  AddProductPayload,
+  EditProductPayload,
+  Product,
+} from "../../interfaces/ProductInterface";
 
 export async function addProduct(payload: AddProductPayload, imageFile: File) {
   const formData = new FormData();
@@ -19,9 +23,29 @@ export async function addProduct(payload: AddProductPayload, imageFile: File) {
     .then((res) => res.data);
 }
 
-export function editProduct(product: Product) {
+export async function editProduct(
+  payload: EditProductPayload,
+  imageFile?: File | null
+) {
+  const formData = new FormData();
+  formData.append("name", payload.name);
+  formData.append("type", payload.type);
+  formData.append("code", payload.code);
+  formData.append("description", payload.description);
+  formData.append("price", String(payload.price));
+
+  if (imageFile) {
+    formData.append("imageFile", imageFile);
+  }
+
+  const config = {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  };
+
   return api
-    .put(`/products/${product.id}/update`, product)
+    .put(`/products/${payload.id}/update`, formData, config)
     .then((res) => res.data);
 }
 

@@ -26,10 +26,14 @@ export function DashboardPage() {
   return (
     <div className="h-full flex flex-col items-center">
       <div className="flex w-[70%] justify-between">
-        <DashboardCard title={"NPS"} chart={false} nps={100} />
+        <DashboardCard
+          title={"NPS"}
+          chart={false}
+          nps={Number(((weekSales / 160) * 100).toFixed(2))}
+        />
 
         <DashboardCard
-          expected={40}
+          expected={160}
           reached={weekSales}
           title={"Week sales"}
           chart
@@ -37,7 +41,7 @@ export function DashboardPage() {
         />
 
         <DashboardCard
-          expected={160}
+          expected={640}
           reached={monthSales}
           title={"Month goal"}
           chart
