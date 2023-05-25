@@ -38,7 +38,6 @@ export const ProductList: React.FunctionComponent<ProductTableProps> = (
 ) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isModalSizesVisible, setisModalSizesVisible] = useState(false);
-  const [isModalEditVisible, setIsModalEditVisible] = useState(false);
   const [productSelected, setProductSelected] = useState<Product | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isPdfOpen, setIsPdfOpen] = useState(false);
@@ -281,21 +280,6 @@ export const ProductList: React.FunctionComponent<ProductTableProps> = (
             </tr>
           )}
         </Tbody>
-        {isModalVisible && productSelected ? (
-          <ModalDelete
-            text={productSelected.name}
-            onCloseModal={() => {
-              setIsModalVisible(false);
-              setProductSelected(null);
-            }}
-            confirmDelete={() => {
-              props.onDelete(productSelected);
-              setIsModalVisible(false);
-              setProductSelected(null);
-            }}
-          />
-        ) : null}
-
         {isModalVisible && productSelected ? (
           <ModalDelete
             text={productSelected.name}

@@ -291,7 +291,7 @@ export async function appRoutes(app: FastifyInstance) {
   });
 
   app.delete(
-    "/product/:id/delete",
+    "/products/:id/delete",
     { preHandler: [validateJwt] },
     async (req: any, res) => {
       const { id } = req.params;
@@ -299,13 +299,58 @@ export async function appRoutes(app: FastifyInstance) {
       try {
         const deletedProduct = await prisma.product.delete({
           where: {
-            id: req.id,
+            id,
+          },
+          include: {
+            sizes: true,
+            cartItems: true,
+            Cart: true,
+            Sales: true,
           },
         });
 
+        if (deletedProduct.sizes && deletedProduct.sizes.length > 0) {
+          await prisma.shoeSize.deleteMany({
+            where: {
+              id: {
+                in: deletedProduct.sizes.map((size) => size.id),
+              },
+            },
+          });
+        }
+
+        if (deletedProduct.cartItems && deletedProduct.cartItems.length > 0) {
+          await prisma.cartItem.deleteMany({
+            where: {
+              id: {
+                in: deletedProduct.cartItems.map((cartItem) => cartItem.id),
+              },
+            },
+          });
+        }
+
+        if (deletedProduct.Cart) {
+          await prisma.cart.delete({
+            where: {
+              id: deletedProduct.Cart.id,
+            },
+          });
+        }
+
+        if (deletedProduct.Sales && deletedProduct.Sales.length > 0) {
+          await prisma.sales.deleteMany({
+            where: {
+              id: {
+                in: deletedProduct.Sales.map((sale) => sale.id),
+              },
+            },
+          });
+        }
+
         res.send(deletedProduct);
       } catch (error) {
-        res.status(500).send({ error: "Error delete product" });
+        console.error(error);
+        res.status(500).send({ error: "Error deleting product" });
       }
     }
   );
