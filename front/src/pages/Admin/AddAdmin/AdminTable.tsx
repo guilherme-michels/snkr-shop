@@ -37,7 +37,7 @@ export function AdminTable() {
     } catch (err) {
       toast({
         position: "top-right",
-        description: "Error",
+        description: "This user cannot be deleted",
         status: "error",
         duration: 4000,
         isClosable: true,

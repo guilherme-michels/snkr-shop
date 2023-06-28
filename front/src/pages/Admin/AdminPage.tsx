@@ -5,6 +5,7 @@ import { AddProduct } from "./AddProduct/AddProduct";
 import { DashboardPage } from "./Dashboard/DashboardPage";
 import { StockControlPage } from "./StockControl/StockControlPage";
 import { AdminTable } from "./AddAdmin/AdminTable";
+import { SalesPage } from "./Sales/SalesPage";
 
 export function AdminPage() {
   return (
@@ -14,9 +15,7 @@ export function AdminPage() {
           <TabList>
             <Tab color={"#000"}>NPS</Tab>
             <Tab color={"#000"}>Stock</Tab>
-            <Tab color={"#000"} isDisabled>
-              Products
-            </Tab>
+            <Tab color={"#000"}>Sales</Tab>
             <Tab color={"#000"}>Add product</Tab>
             <Tab color={"#000"}>Add admin</Tab>
             <Tab color={"#000"}>Users list</Tab>
@@ -30,7 +29,7 @@ export function AdminPage() {
               <StockControlPage />
             </TabPanel>
             <TabPanel>
-              <p>three!</p>
+              <SalesPage />
             </TabPanel>
             <TabPanel>
               <AddProduct />

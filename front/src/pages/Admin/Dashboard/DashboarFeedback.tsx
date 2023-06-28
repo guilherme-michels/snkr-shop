@@ -35,17 +35,15 @@ export function DashboardFeedback(
     format(subDays(new Date(), index), "yyyy-MM-dd")
   );
 
-  const formattedData = last7Days
-    .map((day) => {
-      const salesCount = weekSales.filter(
-        (sale) => format(new Date(sale.data), "yyyy-MM-dd") === day
-      ).length;
-      return {
-        name: format(new Date(day), "EEEE"),
-        Sales: salesCount,
-      };
-    })
-    .reverse();
+  const formattedData = last7Days.map((day) => {
+    const salesCount = weekSales.filter(
+      (sale) => format(new Date(sale.data), "yyyy-MM-dd") === day
+    ).length;
+    return {
+      name: format(new Date(day), "EEEE"),
+      Sales: salesCount,
+    };
+  });
 
   const totalSales = weekSales.length;
   const averageSalesPerDay = (totalSales / 7).toFixed(2);

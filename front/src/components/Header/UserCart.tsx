@@ -45,28 +45,6 @@ export function UserCart({ onCloseCart }: UserCartProps) {
     fetchProducts();
   }, []);
 
-  const onEndPurchase = async (products: CartItem[]) => {
-    try {
-      await addSales(products);
-      toast({
-        position: "top-right",
-        description: "Compra finalizada, obrigado por comprar conosco!",
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-      });
-      fetchProducts();
-    } catch (err) {
-      toast({
-        position: "top-right",
-        description: "Error",
-        status: "error",
-        duration: 1000,
-        isClosable: true,
-      });
-    }
-  };
-
   const onDeleteProductPersonCart = async (productId: string, size: number) => {
     try {
       await deleteProductPersonCart(productId, size);
@@ -132,12 +110,12 @@ export function UserCart({ onCloseCart }: UserCartProps) {
           )}
         </DrawerBody>
         <DrawerFooter className="flex items-center bg-zinc-100 w-full">
-          <button
-            className="bg-zinc-900 hover:opacity-[90%] transition-all w-[270px] p-1 text-white"
-            onClick={() => onEndPurchase(products)}
+          <Link
+            to="/end-purchase"
+            className="bg-zinc-900 hover:opacity-[90%] transition-all w-[270px] p-2 text-white rounded"
           >
             End purchase
-          </button>
+          </Link>
         </DrawerFooter>
       </DrawerContent>
     </>

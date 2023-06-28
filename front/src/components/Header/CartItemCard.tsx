@@ -26,7 +26,7 @@ export function CartItemCard(props: CartItemProps) {
   }, [props.product.image]);
 
   return (
-    <div className="bg-zinc-50 h-auto p-2 rounded-r-lg rounded-b-lg">
+    <div className="bg-zinc-50 h-auto p-2 rounded-r-lg rounded-b-lg w-[280px] shadow-sm shadow-slate-400">
       <div
         className="h-[250px] flex items-end p-4 border-black"
         style={{

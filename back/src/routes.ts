@@ -45,6 +45,8 @@ export async function appRoutes(app: FastifyInstance) {
         token: token,
         email: user.email,
         name: user.firstName,
+        position: user.position,
+        user: user,
         id: user.id,
       });
     }
@@ -380,10 +382,7 @@ export async function appRoutes(app: FastifyInstance) {
         description: data.fields.description.value,
       };
 
-      console.log(body, "teste");
-
       const filename = uuid() + `.` + mime.extension(data.mimetype);
-      console.log(filename, "teste");
       await pump(data.file, fs.createWriteStream(`./images/${filename}`));
 
       const updateProduct = z.object({
@@ -444,30 +443,6 @@ export async function appRoutes(app: FastifyInstance) {
       return reply.send(product);
     } catch (error) {
       return reply.status(500).send({ error: "Error searching product" });
-    }
-  });
-
-  app.get("/sales", async (request, response) => {
-    try {
-      const currentDate = new Date();
-      const lastWeek = new Date();
-      lastWeek.setDate(currentDate.getDate() - 7);
-
-      const sales = await prisma.sales.findMany({
-        where: {
-          data: {
-            gte: lastWeek,
-            lte: currentDate,
-          },
-        },
-        include: {
-          product: true,
-        },
-      });
-
-      response.send(sales);
-    } catch (error) {
-      response.status(500).send("Error getting sales");
     }
   });
 
@@ -571,18 +546,20 @@ export async function appRoutes(app: FastifyInstance) {
   });
 
   app.delete("/person/:id/delete", async (req: any, res) => {
-    const { id } = req.params;
-
     try {
       const deletedPerson = await prisma.user.delete({
         where: {
           id: req.params.id,
         },
+        include: {
+          Cart: true,
+          Sales: true,
+        },
       });
 
       res.send(deletedPerson);
     } catch (error) {
-      res.status(500).send({ error: "Error delete person" });
+      res.status(500).send({ error: "Error deleting person" });
     }
   });
 
@@ -617,6 +594,26 @@ export async function appRoutes(app: FastifyInstance) {
       });
     } catch (error) {
       res.status(500).send({ error: "Error edit person" });
+    }
+  });
+
+  app.get("/person/:id/show", async (req: any, reply) => {
+    const { id } = req.params;
+
+    try {
+      const person = await prisma.user.findUnique({
+        where: {
+          id: id,
+        },
+      });
+
+      if (!person) {
+        return reply.status(404).send({ error: "User not found" });
+      }
+
+      return reply.send(person);
+    } catch (error) {
+      return reply.status(500).send({ error: "Error searching " });
     }
   });
 
@@ -719,12 +716,12 @@ export async function appRoutes(app: FastifyInstance) {
     async (req: any, res: any) => {
       const userId: string = req.user.id;
       const cartItems = req.body.products;
-      console.log(cartItems);
 
       try {
         const salesPromises = cartItems.map(async (cartItem: CartItem) => {
           const { productId }: { productId: string } = cartItem;
 
+          console.log(productId, cartItem.size);
           const itemCart = await prisma.cartItem.findFirst({
             where: {
               productId,
@@ -738,6 +735,8 @@ export async function appRoutes(app: FastifyInstance) {
               },
             },
           });
+
+          console.log;
 
           if (!itemCart || !itemCart.cart || itemCart.cart.userId !== userId) {
             return res.status(404).send({ error: "Item not found in cart" });
@@ -783,12 +782,61 @@ export async function appRoutes(app: FastifyInstance) {
     }
   );
 
-  app.get("/sales/week-sales", async (req, res) => {
+  app.get("/sales/:userId", async (req: any, res) => {
+    try {
+      const userId = req.params.userId;
+
+      const userSales = await prisma.sales.findMany({
+        where: {
+          userId: userId,
+        },
+        include: {
+          product: true,
+          user: true,
+        },
+      });
+
+      return res.send({ sales: userSales });
+    } catch (error) {
+      return res.status(500).send({ error: "Error retrieving user sales" });
+    }
+  });
+
+  app.get("/sales", async (req, res) => {
+    try {
+      const sales = await prisma.sales.findMany({
+        include: {
+          product: true,
+          user: true,
+        },
+      });
+
+      return res.send({ sales });
+    } catch (error) {
+      return res.status(500).send({ error: "Error retrieving sales" });
+    }
+  });
+
+  app.delete("/sales/:id/delete", async (req: any, res) => {
+    const saleId = req.params.id;
+
+    try {
+      const deletedSale = await prisma.sales.delete({
+        where: { id: saleId },
+      });
+
+      return res.send({ message: "Sale deleted successfully" });
+    } catch (error) {
+      return res.status(500).send({ error: "Error deleting sale" });
+    }
+  });
+
+  app.get("/sales/month-sales", async (req, res) => {
     try {
       const currentDate = new Date();
 
       const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(currentDate.getDate() - 7);
+      sevenDaysAgo.setDate(currentDate.getDate() - 30);
 
       const recentSales = await prisma.sales.findMany({
         where: {
@@ -809,12 +857,12 @@ export async function appRoutes(app: FastifyInstance) {
     }
   });
 
-  app.get("/sales/month-sales", async (req, res) => {
+  app.get("/sales/week-sales", async (req, res) => {
     try {
       const currentDate = new Date();
 
       const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(currentDate.getDate() - 30);
+      sevenDaysAgo.setDate(currentDate.getDate() - 7);
 
       const recentSales = await prisma.sales.findMany({
         where: {

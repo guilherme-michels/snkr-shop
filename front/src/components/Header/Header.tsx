@@ -15,12 +15,13 @@ import {
   UserCircle,
   X,
 } from "phosphor-react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { UserCart } from "./UserCart";
 import { useAuth } from "../../context/AuthContext";
 
 export function Header() {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const navigate = useNavigate();
 
   const { auth, logout } = useAuth();
 
@@ -60,6 +61,9 @@ export function Header() {
                 />
               </MenuButton>
               <MenuList>
+                <MenuItem onClick={() => navigate(`/my-profile`)}>
+                  Profile
+                </MenuItem>
                 <MenuItem onClick={() => logout()}>Logout</MenuItem>
               </MenuList>
             </Menu>
@@ -77,12 +81,14 @@ export function Header() {
             onClick={onOpen}
           />
 
-          <Link to="/admin">
-            <ChartLine
-              size={36}
-              className="mr-20 text-white cursor-pointer  hover:opacity-80 transition-all rounded-full h-8 w-8"
-            />
-          </Link>
+          {localStorage.getItem("position") === "Admin" && (
+            <Link to="/admin">
+              <ChartLine
+                size={36}
+                className="mr-20 text-white cursor-pointer  hover:opacity-80 transition-all rounded-full h-8 w-8"
+              />
+            </Link>
+          )}
 
           <Drawer placement={"right"} onClose={onClose} isOpen={isOpen}>
             <UserCart onCloseCart={onClose} />

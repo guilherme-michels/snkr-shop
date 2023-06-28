@@ -16,6 +16,7 @@ export interface loginPeople {
   password: string;
   name?: string;
   id?: string;
+  position?: string;
 }
 
 export function addPerson(person: Omit<Person, "id">) {
@@ -28,18 +29,8 @@ export function editPerson(person: Person) {
   return api.put(`/person/${person.id}/update`, person).then((res) => res.data);
 }
 
-export function editPassword(person: Person) {
-  return api
-    .put(`/persons/${person.id}/update`, person)
-    .then((res) => res.data);
-}
-
 export function getPerson(personId: string) {
   return api.get<Person>(`/person/${personId}/show`).then((res) => res.data);
-}
-
-export function getPersonMe() {
-  return api.get<PersonResponse>(`/persons/me`).then((res) => res.data);
 }
 
 export function getPeople() {
@@ -47,7 +38,7 @@ export function getPeople() {
 }
 
 export function deletePerson(personId: string) {
-  return api.delete(`/persons/${personId}/delete`).then((res) => res.data);
+  return api.delete(`/person/${personId}/delete`).then((res) => res.data);
 }
 
 export function validateLogin(person: loginPeople) {

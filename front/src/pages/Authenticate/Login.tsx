@@ -33,7 +33,7 @@ export function Login() {
 
     try {
       const res = await validateLogin(data);
-      login(res.token!, res.id!);
+      login(res.token!, res.id!, res.position!);
 
       if (res.id != null) {
         toast({

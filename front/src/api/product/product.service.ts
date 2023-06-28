@@ -105,6 +105,18 @@ export function getWeekSales() {
   return api.get("/sales/week-sales").then((res) => res.data);
 }
 
+export function getSales() {
+  return api.get("/sales").then((res) => res.data);
+}
+
+export function getSalesByUser(userId: string) {
+  return api.get(`/sales/${userId}`).then((res) => res.data);
+}
+
+export function deleteSale(saleId: string) {
+  return api.delete(`/sales/${saleId}/delete`).then((res) => res.data);
+}
+
 export function getMonthSales() {
-  return api.get("/sales/week-sales").then((res) => res.data);
+  return api.get("/sales/month-sales").then((res) => res.data);
 }

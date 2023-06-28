@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { useToast } from "@chakra-ui/react";
+import { Select, useToast } from "@chakra-ui/react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { z } from "zod";
@@ -43,6 +43,8 @@ export function AdminEdit() {
         ...values,
         id: params.id,
       });
+
+      localStorage.setItem("position", values.position);
 
       toast({
         description: "User successfully edited.",
@@ -165,12 +167,15 @@ export function AdminEdit() {
             <div className="grid grid-cols-2 grid-flow-row gap-14">
               <div className="mt-3">
                 <label>Position *</label>
-                <input
-                  type="text"
-                  placeholder="Position"
-                  className="w-full p-3 mt-1 rounded-lg placeholder:text-zinc-400 border-[1px] border-zinc-500"
+                <Select
+                  placeholder="Select position"
+                  className="w-full mt-1 rounded-lg placeholder:text-zinc-400 border-[1px] border-zinc-900"
                   {...register("position")}
-                />
+                  height={12}
+                >
+                  <option value="Admin">Admin</option>
+                  <option value="User">User</option>
+                </Select>
               </div>
 
               <div className="mt-3">
