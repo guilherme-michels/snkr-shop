@@ -113,8 +113,8 @@ export function getSalesByUser(userId: string) {
   return api.get(`/sales/${userId}`).then((res) => res.data);
 }
 
-export function deleteSale(saleId: string) {
-  return api.delete(`/sales/${saleId}/delete`).then((res) => res.data);
+export function deleteSale(id: string) {
+  return api.delete(`/sales/${id}/delete`).then((res) => res.data);
 }
 
 export function getMonthSales() {

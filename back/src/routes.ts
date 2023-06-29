@@ -822,7 +822,7 @@ export async function appRoutes(app: FastifyInstance) {
 
     try {
       const deletedSale = await prisma.sales.delete({
-        where: { id: saleId },
+        where: { id: Number(saleId) },
       });
 
       return res.send({ message: "Sale deleted successfully" });

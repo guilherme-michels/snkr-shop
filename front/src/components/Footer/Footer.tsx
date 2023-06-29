@@ -6,7 +6,9 @@ export function Footer() {
     <div className="w-full h-64 bg-black flex justify-center">
       <div className="w-[65%] justify-between flex p-4">
         <div className="flex flex-col">
-          <strong className="mb-1 text-white">Found us</strong>
+          <Link to="/find-us">
+            <strong className="mb-1 text-white">Find us</strong>
+          </Link>
           <hr />
           <div className="flex text-white text-sm mt-1">Find SNKR SHOP</div>
           <div className="flex text-white text-sm">Gift card</div>

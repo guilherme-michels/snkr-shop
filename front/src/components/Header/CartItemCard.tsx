@@ -1,9 +1,6 @@
-import { Link } from "react-router-dom";
 import { Product } from "../../interfaces/ProductInterface";
 import { useEffect, useState } from "react";
 import { getImage } from "../../api/product/product.service";
-import { ShoppingCart, Trash } from "phosphor-react";
-import { deleteProductPersonCart } from "../../api/person/person.service";
 import { useToast } from "@chakra-ui/react";
 
 interface CartItemProps {

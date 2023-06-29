@@ -10,6 +10,7 @@ import { NikeInvenciblePage } from "../pages/Shoes/NikeInvencible";
 import { ProductEdit } from "../pages/Admin/AddProduct/ProductEdit";
 import { UserPage } from "../pages/User/UserPage";
 import { EndPurchasePage } from "../pages/User/EndPurchase";
+import { Map } from "../pages/Admin/Map/Map";
 
 export function AppRoutes() {
   return (
@@ -18,11 +19,10 @@ export function AppRoutes() {
       <Route path="/my-profile" element={<UserPage />} />
       <Route path="/" element={<LandingPage />} />
       <Route path="/end-purchase" element={<EndPurchasePage />} />
-
+      <Route path="/find-us" element={<Map />} />
       <Route path="/shoes" element={<ShoesPage />} />
       <Route path="/shoes/:id/see" element={<ShoePage />} />
       <Route path="/product/:id/update" element={<ProductEdit />} />
-
       <Route path="/shoes/nike-invencible" element={<NikeInvenciblePage />} />
     </ReactRoutes>
   );
@@ -32,16 +32,15 @@ function AdminRoutes() {
   return (
     <ReactRoutes>
       <Route path="/admin" element={<AdminPage />} />
+      <Route path="/find-us" element={<Map />} />
       <Route path="/my-profile" element={<UserPage />} />
       <Route path="/person/:id/update" element={<AdminEdit />} />
       <Route path="/end-purchase" element={<EndPurchasePage />} />
       <Route path="/" element={<LandingPage />} />
       <Route path="/authenticate" element={<Authenticate />} />
-
       <Route path="/shoes" element={<ShoesPage />} />
       <Route path="/shoes/:id/see" element={<ShoePage />} />
       <Route path="/product/:id/update" element={<ProductEdit />} />
-
       <Route path="/shoes/nike-invencible" element={<NikeInvenciblePage />} />
     </ReactRoutes>
   );
