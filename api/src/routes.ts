@@ -52,6 +52,57 @@ export async function appRoutes(app: FastifyInstance) {
     }
   });
 
+  app.post("/register", async (req: any, res) => {
+    const { email, password, firstName, lastName } = req.body;
+
+    try {
+      const existingUser = await prisma.user.findUnique({
+        where: {
+          email,
+        },
+      });
+
+      if (existingUser) {
+        return res.status(400).send({ error: "Email already exists" });
+      }
+      const newUser = await prisma.user.create({
+        data: {
+          email,
+          password,
+          cpf: "",
+          dateBirth: "",
+          firstName,
+          lastName,
+          phone: "",
+          position: "Admin",
+          Cart: {
+            create: {
+              products: undefined,
+            },
+          },
+        },
+        include: {
+          Cart: true,
+          Sales: true,
+        },
+      });
+
+      let token = jwt.sign({ userId: newUser.id }, "mysecret");
+
+      return res.send({
+        token,
+        email: newUser.email,
+        name: newUser.firstName,
+        position: newUser.position,
+        user: newUser,
+        id: newUser.id,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({ error: "Registration failed" });
+    }
+  });
+
   app.post(
     "/products/store",
     { preHandler: [validateJwt] },

@@ -15,6 +15,13 @@ export function Authenticate() {
       <div className="flex justify-start absolute  w-full transition-all">
         {loginOrRegister ? <Login /> : <Register />}
       </div>
+
+      <div
+        className="absolute top-[10%] left-[48%] text-white font-bold cursor-pointer"
+        onClick={() => setLoginOrRegister(!loginOrRegister)}
+      >
+        Register
+      </div>
     </div>
   );
 }

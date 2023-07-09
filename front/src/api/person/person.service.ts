@@ -19,6 +19,13 @@ export interface loginPeople {
   position?: string;
 }
 
+export interface registerAccount {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+}
+
 export function addPerson(person: Omit<Person, "id">) {
   return api
     .post<PersonResponse>("/person/store", person)
@@ -43,6 +50,10 @@ export function deletePerson(personId: string) {
 
 export function validateLogin(person: loginPeople) {
   return api.post<loginPeople>("/login", person).then((res) => res.data);
+}
+
+export function createAccount(person: registerAccount) {
+  return api.post("/register", person).then((res) => res.data);
 }
 
 export function getPersonCart() {
