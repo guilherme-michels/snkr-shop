@@ -95,7 +95,7 @@ export function Login() {
           </form>
 
           <span className="mt-8 p-2 rounded flex items-center justify-center text-zinc-50 cursor-pointer hover:text-zinc-400 transition-all text-sm">
-            Forgot the password?
+            Forgot the password??
           </span>
 
           <div className="mt-24 flex w-1/5 justify-between">
