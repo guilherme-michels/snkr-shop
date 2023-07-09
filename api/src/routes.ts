@@ -281,7 +281,7 @@ export async function appRoutes(app: FastifyInstance) {
     }
   );
 
-  app.get("/products", { preHandler: [validateJwt] }, async (req, res) => {
+  app.get("/products", async (req, res) => {
     try {
       const products = await prisma.product.findMany();
 
