@@ -90,7 +90,7 @@ export function Login() {
               className="text-black bg-white w-[100px]  p-4 rounded cursor-pointer mt-8 transition-all font-bold "
               type="submit"
             >
-              Joinaaa
+              TESTETTETE
             </button>
           </form>
 
