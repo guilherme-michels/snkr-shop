@@ -58,7 +58,9 @@ export function Login() {
   return (
     <>
       <div className="flex-col flex items-center w-full justify-center h-full mt-48">
-        <strong className="text-4xl font-extrabold text-zinc-100">Login</strong>
+        <strong className="text-4xl font-extrabold text-zinc-100">
+          Loginaaaa
+        </strong>
         <div className="flex flex-col items-center w-full">
           <form
             onSubmit={onFormSubmit}
